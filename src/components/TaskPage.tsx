@@ -1,6 +1,7 @@
-import { useState , useEffect} from "react";
+import { useState , useEffect, useRef} from "react";
 import { invoke } from "@tauri-apps/api/tauri";
-import { Tabs, TabList, TabPanels, Tab, Box, Checkbox, useColorMode, Button, Avatar, AvatarBadge, AvatarGroup, Wrap, WrapItem  } from '@chakra-ui/react'
+import { Tabs, TabList, TabPanels, Tab, Box, Checkbox, Input, IconButton, Wrap, WrapItem} from '@chakra-ui/react'
+import { CheckIcon } from "@chakra-ui/icons";
 
 
 type task = {
@@ -54,6 +55,7 @@ const sampleTaskCategories: taskCategory[] = [
 export default function TaskPage() {
   const [taskCategories, setTaskCategories] = useState<taskCategory[]>([])
   const [activeTaskCategory, setActiveTaskCategory] = useState<number>(0);
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setTaskCategories(sampleTaskCategories)
@@ -99,6 +101,26 @@ export default function TaskPage() {
                     <Checkbox isChecked={task.done} onChange={() => handleTaskCheck(task)}>{task.name}</Checkbox>
                   </Box>
               ))}
+                <Wrap p="2" spacing="30px">
+                    <WrapItem>         
+                        <Input
+                            w='auto'
+                            display='inline-flex'
+                            defaultValue='Popover Anchor'
+                            ref={inputRef}
+                        />
+                    </WrapItem>
+                    <WrapItem>           
+                        <IconButton
+                        isRound={true}
+                        variant="solid"
+                        colorScheme="teal"
+                        aria-label="Done"
+                        fontSize="20px"
+                        icon={<CheckIcon />}
+                        />
+                    </WrapItem>
+                </Wrap>
             </TabPanels>
           </Box>
         </Tabs>
