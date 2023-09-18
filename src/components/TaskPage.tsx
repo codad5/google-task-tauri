@@ -79,6 +79,24 @@ export default function TaskPage() {
     setActiveTaskCategory(old => old)
   }
 
+    const handleAddTask = () => {
+        if (!inputRef.current) return;
+        if (inputRef.current.value === '') return;
+        if (activeTaskCategory < 0) return;
+        const old = taskCategories
+        const newTaskCategory = old[activeTaskCategory]
+        delete taskCategories[activeTaskCategory];
+        newTaskCategory.tasks.push({
+            name: inputRef.current?.value || '',
+            description: '',
+            dueDate: new Date(),
+            done: false
+        })
+        old[activeTaskCategory] = newTaskCategory
+        setTaskCategories([...old])
+        setActiveTaskCategory(old => old)
+    }
+
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
     // setGreetMsg(await invoke("greet", { name }));
@@ -106,7 +124,6 @@ export default function TaskPage() {
                         <Input
                             w='auto'
                             display='inline-flex'
-                            defaultValue='Popover Anchor'
                             ref={inputRef}
                         />
                     </WrapItem>
@@ -118,6 +135,7 @@ export default function TaskPage() {
                         aria-label="Done"
                         fontSize="20px"
                         icon={<CheckIcon />}
+                        onClick={handleAddTask}
                         />
                     </WrapItem>
                 </Wrap>
