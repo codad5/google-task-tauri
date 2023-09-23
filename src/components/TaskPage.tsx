@@ -5,27 +5,32 @@ import { CheckIcon } from "@chakra-ui/icons";
 
 
 type task = {
+  id:number,
   name: string,
   description: string,
   dueDate: Date,
   done: boolean
 }
 type taskCategory = {
+  id:number,
   name: string,
   tasks: task[]
 }
 
 const sampleTaskCategories: taskCategory[] = [
   {
+    id:1,
     name: 'Category 1',
     tasks: [
       {
+        id:1,
         name: 'Task 1',
         description: 'This is task 1',
         dueDate: new Date(),
         done: false
       },
       {
+        id:2,
         name: 'Task 2',
         description: 'This is task 2',
         dueDate: new Date(),
@@ -34,15 +39,18 @@ const sampleTaskCategories: taskCategory[] = [
     ]
   },
   {
+    id:2,
     name: 'Category 2',
     tasks: [
       {
+        id:1,
         name: 'Task 1',
         description: 'This is task 1',
         dueDate: new Date(),
         done: false
       },
       {
+        id:2,
         name: 'Task 2',
         description: 'This is task 2',
         dueDate: new Date(),
@@ -54,7 +62,7 @@ const sampleTaskCategories: taskCategory[] = [
 
 export default function TaskPage() {
   const [taskCategories, setTaskCategories] = useState<taskCategory[]>([])
-  const [activeTaskCategory, setActiveTaskCategory] = useState<number>(0);
+  const [activeTaskCategory, setActiveTaskCategory] = useState<number>(sampleTaskCategories[0].id)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -68,7 +76,7 @@ export default function TaskPage() {
     const newTaskCategory = old[activeTaskCategory]
     delete taskCategories[activeTaskCategory];
       const newTasks = newTaskCategory.tasks.map((t) => {
-        if (t.name === task.name) {
+        if (t.id === task.id) {
           t.done = !t.done
         }
         return t
@@ -79,14 +87,17 @@ export default function TaskPage() {
     setActiveTaskCategory(old => old)
   }
 
-    const handleAddTask = () => {
+  const handleAddTask = (e) => {
+    console.log("test");
+        e.preventDefault();
         if (!inputRef.current) return;
         if (inputRef.current.value === '') return;
         if (activeTaskCategory < 0) return;
         const old = taskCategories
         const newTaskCategory = old[activeTaskCategory]
         delete taskCategories[activeTaskCategory];
-        newTaskCategory.tasks.push({
+    newTaskCategory.tasks.push({
+            id: newTaskCategory.tasks.length + 1,
             name: inputRef.current?.value || '',
             description: '',
             dueDate: new Date(),
@@ -119,26 +130,27 @@ export default function TaskPage() {
                     <Checkbox isChecked={task.done} onChange={() => handleTaskCheck(task)}>{task.name}</Checkbox>
                   </Box>
               ))}
-                <Wrap p="2" spacing="30px">
-                    <WrapItem>         
-                        <Input
-                            w='auto'
-                            display='inline-flex'
-                            ref={inputRef}
-                        />
-                    </WrapItem>
-                    <WrapItem>           
-                        <IconButton
-                        isRound={true}
-                        variant="solid"
-                        colorScheme="teal"
-                        aria-label="Done"
-                        fontSize="20px"
-                        icon={<CheckIcon />}
-                        onClick={handleAddTask}
-                        />
-                    </WrapItem>
-                </Wrap>
+                <form onSubmit={handleAddTask} >
+                  <Wrap p="2" spacing="30px">
+                      <WrapItem>         
+                          <Input
+                              w='auto'
+                              display='inline-flex'
+                              ref={inputRef}
+                              />
+                      </WrapItem>
+                      <WrapItem>           
+                          <IconButton
+                          isRound={true}
+                          variant="solid"
+                          colorScheme="teal"
+                          aria-label="Done"
+                          fontSize="20px"
+                          icon={<CheckIcon />}
+                          />
+                      </WrapItem>
+                  </Wrap>
+                </form>
             </TabPanels>
           </Box>
         </Tabs>
