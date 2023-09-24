@@ -27,7 +27,21 @@
       },
       "fs": {
         "all": true,
-        "scope": ["$APPLOCALDATA/codad5.google.task/**/*"]
+        "scope": [
+          "$APPDATA/codad5.google.task/**",
+          "$APPDATA/codad5.google.task/*",
+          "$APPDATA/codad5.google.task",
+          "$APPDATA/**",
+          "$APPDATA/*",
+          "$APPDATA",
+          "$DOWNLOAD/codad5.google.task/**",
+          "$DOWNLOAD/codad5.google.task/*",
+          "$DOWNLOAD/codad5.google.task",
+          "$DOWNLOAD/**",
+          "$DOWNLOAD/*",
+          "$DOWNLOAD"
+
+        ]
       }
     },
     "bundle": {
