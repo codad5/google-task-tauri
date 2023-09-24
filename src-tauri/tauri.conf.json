@@ -39,8 +39,13 @@
           "$DOWNLOAD/codad5.google.task",
           "$DOWNLOAD/**",
           "$DOWNLOAD/*",
-          "$DOWNLOAD"
-
+          "$DOWNLOAD",
+          "$APPLOCALDATA/codad5.google.task/**",
+          "$APPLOCALDATA/codad5.google.task/*",
+          "$APPLOCALDATA/codad5.google.task",
+          "$APPLOCALDATA/**",
+          "$APPLOCALDATA/*",
+          "$APPLOCALDATA"
         ]
       }
     },

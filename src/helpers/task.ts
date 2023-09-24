@@ -2,7 +2,7 @@ import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 import axios from "axios";
 import { task, taskCategory } from "../types/taskapi";
 import { BaseDirectory } from "@tauri-apps/api/fs";
-const DEFAULT_DIRECTORY = BaseDirectory.Download;
+const DEFAULT_DIRECTORY = BaseDirectory.AppLocalData
 export class Task {
     readonly accessToken: string;
     baseUrl = "https://tasks.googleapis.com/tasks/v1";

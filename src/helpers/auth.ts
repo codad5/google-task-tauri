@@ -5,7 +5,7 @@ import { BaseDirectory, readTextFile, removeFile, writeTextFile } from "@tauri-a
 import { CLIENT_ID, CLIENT_SECRET } from "../assets/credentials";
 
 
-const DEFAULT_DIRECTORY = BaseDirectory.Download;
+const DEFAULT_DIRECTORY = BaseDirectory.AppLocalData;
 const GOOGLE_OAUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
 const SCOPE = "https://www.googleapis.com/auth/tasks " +
   "https://www.googleapis.com/auth/userinfo.profile " +
