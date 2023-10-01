@@ -1,36 +1,27 @@
 import { useState , useEffect, useRef} from "react";
-import { invoke } from "@tauri-apps/api/tauri";
 import { Tabs, TabList, TabPanels, Tab, Box, Checkbox, Input, IconButton, Wrap, WrapItem} from '@chakra-ui/react'
 import { CheckIcon } from "@chakra-ui/icons";
 import { taskCategory, task } from "../types/taskapi";
 import { Task } from "../helpers/task";
 
-
+const Taskobject  = new Task()
 
 export default function TaskPage({access_token}: {access_token?: string}) {
   const [taskCategories, setTaskCategories] = useState<taskCategory[]>([])
   const [activeTaskCategory, setActiveTaskCategory] = useState<number>(0)
-  const [loading, setLoading] = useState<boolean>(true)
   const inputRef = useRef<HTMLInputElement>(null)
-  const Taskobject  = new Task(access_token!)
+  Taskobject.setAccessToken(access_token || '')
+  
 
   useEffect(() => {
-    // setTaskCategories(sampleTaskCategories)
-    if (Taskobject.tasks.length <= 0) {
-      Taskobject.getTaskCategories().then((res) => {
-        Taskobject.getTasksByCategoryPosition(activeTaskCategory).then((res) => {
-          setTaskCategories(Taskobject.tasks)
+    Taskobject.getTaskCategories().then(() => {
+        Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
+          // console.log('setting tasks')
+          // console.log(Taskobject.getTasks)
+          setTaskCategories(Taskobject.getTasks)
         })
       })
-    }
-    else {
-      console.log('using cached tasks')
-      Taskobject.getTasksByCategoryPosition(activeTaskCategory).then((res) => {
-        setTaskCategories(Taskobject.tasks)
-      })
-    }
   console.log(taskCategories[activeTaskCategory], "active task category")
-  setLoading(false)
   }, [activeTaskCategory])
 
   //  on a task check update the current active task category and update the task
@@ -75,10 +66,7 @@ export default function TaskPage({access_token}: {access_token?: string}) {
         setActiveTaskCategory(old => old)
     }
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    // setGreetMsg(await invoke("greet", { name }));
-  }
+
 
   return (
     <div className="">

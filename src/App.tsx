@@ -1,9 +1,7 @@
 import { useState , useEffect} from "react";
-import { invoke } from "@tauri-apps/api/tauri";
 import { Avatar, Box, Button, Spinner, Wrap, WrapItem, useColorMode, Popover, useToast  , PopoverTrigger, Portal, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader  } from '@chakra-ui/react'
 import TaskPage from "./components/TaskPage";
 import { listen } from "@tauri-apps/api/event";
-import axios from "axios";
 import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken } from "./helpers/auth";
 import { AccessToken, UserProfile } from "./types/googleapis";
 
@@ -12,7 +10,6 @@ function App() {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const { colorMode, toggleColorMode } = useColorMode()
-  const [oauthPort, setOauthPort] = useState<number | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   // error message toast
@@ -21,10 +18,9 @@ function App() {
 
   // to generate a port and listen to it
   useEffect(() => {
-    const unlisten = listen("oauth://url", async (data) => {
+    listen("oauth://url", async (data) => {
       try {
         console.log(data, "data");
-        setOauthPort(null);
         if (!data.payload) return;
         const url = new URL(data.payload as string);
         const code = new URLSearchParams(url.search).get("code");

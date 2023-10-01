@@ -4,14 +4,25 @@ import { task, taskCategory } from "../types/taskapi";
 import { BaseDirectory } from "@tauri-apps/api/fs";
 const DEFAULT_DIRECTORY = BaseDirectory.AppLocalData
 export class Task {
-    readonly accessToken: string;
+    accessToken ?: string;
     baseUrl = "https://tasks.googleapis.com/tasks/v1";
-    tasks: taskCategory[] = [];
-    constructor(accessToken: string) {
+    private tasks: taskCategory[] = [];
+    lastUpdate: { [key: number|string]: Date } = {};
+
+    constructor(accessToken ?: string) {
         this.accessToken = accessToken;
     }
+    setAccessToken(accessToken: string) {
+        this.accessToken = accessToken;
+    }
+
+    get getTasks() {
+        return this.tasks;
+    }
+
     async getTaskCategories() {
         try {
+            if (!this.accessToken) throw new Error("Access token not found");
             let tasks = null;
             // check if online and get tasks from api
             if (navigator.onLine) {
@@ -20,10 +31,19 @@ export class Task {
                 // get tasks from file
                 tasks = await this.getTasksFromFile();
             }
-            this.tasks = tasks;
+            if (tasks) {
+                this.tasks = tasks.map((taskCategory) => {
+                    // if category with same id exists, merge them
+                    const existingCategory = this.tasks.find((category) => category.id === taskCategory.id);
+                    if (existingCategory) {
+                        taskCategory.tasks = [...existingCategory.tasks!, ...taskCategory.tasks!];
+                    }
+                    return taskCategory;
+                });
+            }
             return tasks;
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             return [];
         }
     }
@@ -41,12 +61,15 @@ export class Task {
                 name: item.title,
             };
         });
-        await this.saveTasksToFile(taskCategories);
         return taskCategories;
     }
 
-    async saveTasksToFile(taskCategories ?: taskCategory[]) {
-        const tasks = JSON.stringify(taskCategories || this.tasks);
+    async saveTasksToFile(taskCategories?: taskCategory[]) {
+        const tobeSaved = taskCategories || this.tasks;
+        console.log(tobeSaved, 'tobesaved');
+        // console.log the stack trace , what function called this function
+        console.trace();
+        const tasks = JSON.stringify(tobeSaved);
         await writeTextFile("tasks.json", tasks, { dir: DEFAULT_DIRECTORY });
     }
 
@@ -58,26 +81,35 @@ export class Task {
     async getTasksByCategoryPosition(position: number) {
         try {
             let tasks = null;
+            let readfromfile = false;
+            console.log(this.tasks, "this.tasks", "before if");
+            // if the lastTaskCategoryByPosition is less than 2 minutes, return the tasks
+            if (this.lastUpdate[position] && (new Date().getTime() - this.lastUpdate[position].getTime()) < (45 * 1000)) {
+                tasks = await this.getTasksByCategoryPositionFromFile(position);
+                console.log("using file cache");
+                readfromfile = true;
+                // console.log("from file", tasks);
+            }
             // check if online and get tasks from api
-            if (navigator.onLine) {
+            else if (navigator.onLine) {
                 tasks = await this.getTasksByCategoryPositionFromApi(position);
             } else {
-                // get tasks from file
                 tasks = await this.getTasksByCategoryPositionFromFile(position);
+                readfromfile = true;
             }
-            console.log(tasks);
+            // console.log(tasks);
             this.tasks[position] = { ...this.tasks[position], tasks };
-            console.log(this.tasks);
-            await this.saveTasksToFile();
+            console.log(this.tasks, "this.tasks", "after if");
+            if(!readfromfile) await this.saveTasksToFile();
             return tasks;
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             return [];
         }
     }
 
     async getTasksByCategoryPositionFromApi(position: number): Promise<task[]> {
-        console.log("task from api");
+        // console.log("task from api");
         const taskCategory = this.tasks[position]
         if (!taskCategory) return [];
         const url = `${this.baseUrl}/lists/${taskCategory.id}/tasks`;
@@ -86,7 +118,7 @@ export class Task {
                 Authorization: `Bearer ${this.accessToken}`,
             },
         });
-        console.log(response.data);
+        // console.log(response.data);
         const tasks: task[] = response.data.items.map((item: any) => {
             return {
                 id: item.id,
@@ -96,6 +128,7 @@ export class Task {
                 completed: item.status === "completed",
             };
         });
+        this.lastUpdate[position] = new Date();
         return tasks;
     }
 
@@ -107,13 +140,22 @@ export class Task {
 
     async getTaskById(categoryID: string) {
         try {
-            let task : task[] = []
+            let task: task[] = []
+            let readfromfile = false;
+            
+            // if the lastTaskCategoryByPosition is less than 2 minutes, return the tasks
+            if (this.lastUpdate[categoryID] && (new Date().getTime() - this.lastUpdate[categoryID].getTime()) < 45 * 1000) {
+                task = await this.getTaskByIdFromFile(categoryID);
+                console.log("using file cache");
+                readfromfile = true;
+                // console.log("from file", task);
+            }
             // check if online and get tasks from api
-            if (navigator.onLine) {
+            else if (navigator.onLine) {
                 task = await this.getTaskByIdFromApi(categoryID);
             } else {
-                // get tasks from file
                 task = await this.getTaskByIdFromFile(categoryID);
+                readfromfile = true;
             }
             let newTask = this.tasks.map((taskCategory) => {
                 if (taskCategory.id === categoryID) {
@@ -122,10 +164,10 @@ export class Task {
                 return taskCategory;
             });
             this.tasks = newTask;
-            await this.saveTasksToFile();
+            if(!readfromfile) await this.saveTasksToFile();
             return task;
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             return null;
         }
     }
@@ -146,6 +188,7 @@ export class Task {
                 completed: item.status !== "needsAction",
             };
         });
+        this.lastUpdate[categoryID] = new Date();
         return tasks;
     }
 
@@ -156,7 +199,7 @@ export class Task {
     }
 
     async markTask(task: task, categoryID : string){
-        console.log(task.completed, "mark task");
+        // console.log(task.completed, "mark task");
         const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks/${task.id}`
         const response = await axios.put(url, {
             id: task.id,
@@ -167,7 +210,7 @@ export class Task {
                 Authorization: `Bearer ${this.accessToken}`,
             },
         });
-        console.log(response.data, "mark task");
+        // console.log(response.data, "mark task");
         return response.data;
 
     }
@@ -181,7 +224,7 @@ export class Task {
                 Authorization: `Bearer ${this.accessToken}`,
             },
         });
-        console.log(response.data, "add task");
+        // console.log(response.data, "add task");
         return response.data;
     }
 }
