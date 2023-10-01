@@ -11,10 +11,24 @@ const SCOPE = "https://www.googleapis.com/auth/tasks " +
   "https://www.googleapis.com/auth/userinfo.profile " +
   "https://www.googleapis.com/auth/userinfo.email";
 
-const port = await generatePort();
+// anonymous class for managing port
+class PortManager {
+    private port ?: number;
+    async getPort() {
+        this.port = this.port || await this.generatePort();
+        return this.port;
+    }
+    async generatePort() : Promise<number> {
+        const port = await invoke("plugin:oauth|start");
+        return port as number;
+    }
+}
+
+const portManager = new PortManager();
 
 export async function getAccessToken(code: string) : Promise<AccessToken> {
     try {
+        const port = await portManager.getPort();
         const data = {
             code,
             client_id: CLIENT_ID,
@@ -60,7 +74,7 @@ export async function openAuthWindow() {
     url.searchParams.append("scope", SCOPE);
     url.searchParams.append("response_type", "code");
     url.searchParams.append("client_id", CLIENT_ID);
-    url.searchParams.append("redirect_uri", getLocalHostUrl(port));
+    url.searchParams.append("redirect_uri", getLocalHostUrl(await portManager.getPort()));
     url.searchParams.append("include_granted_scopes", "true");
     url.searchParams.append("state", "state_parameter_passthrough_value");
     shell.open(url.href);
@@ -145,9 +159,6 @@ function getLocalHostUrl(port: number) {
   return `http://localhost:${port}`;
 }
 
-async function generatePort() : Promise<number> {
-  const port = await invoke("plugin:oauth|start");
-  return port as number;
-}
+
 
 
