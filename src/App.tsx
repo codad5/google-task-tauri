@@ -1,32 +1,21 @@
 import { useState , useEffect} from "react";
 import { Avatar, Box, Button, Spinner, Wrap, WrapItem, useColorMode, Popover, useToast  , PopoverTrigger, Portal, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader  } from '@chakra-ui/react'
-import TaskPage from "./components/TaskPage";
+import TaskPage from "./components/TaskPageOld";
 import { listen } from "@tauri-apps/api/event";
 import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken } from "./helpers/auth";
 import { AccessToken, UserProfile } from "./types/googleapis";
-import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/api/notification';
-import { disableMenu } from "./helpers/windowhelper";
+import { disableMenu, pushNotification } from "./helpers/windowhelper";
+import TaskPage2 from "./components/TaskPage";
 
 // disable default context menu on build
 disableMenu();
 
-isPermissionGranted().then((granted) => {
-  if (!granted) {
-    requestPermission().then((granted) => {
-      if (!granted) {
-        console.log("permission not granted");
-        return;
-      }
-    });
-  }
-  console.log("permission granted");
-  sendNotification({
-    title: "Google Tasks Desktop",
-    body: "Thanks for using Google Tasks Desktop",
-  });
-});
 
-
+pushNotification({
+  title: 'Hello World',
+  body: 'This is a notification from Tauri!',
+  icon: 'https://tauri.studio/favicon.ico'
+})
 
 function App() {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -188,7 +177,7 @@ function App() {
                       </Portal>
                     </Popover>
                   ) :
-                  <Button onClick={() => setLoggedIn(true)}>Signin</Button>
+                  <Button onClick={handleLogin}>Signin</Button>
                 }
             </WrapItem>
             <WrapItem>
@@ -198,7 +187,7 @@ function App() {
                 </WrapItem>
             </Wrap>
         </Box>
-        {loggedIn ? <TaskPage access_token={accessToken ?? undefined} /> :
+        {loggedIn ? <TaskPage2 access_token={accessToken ?? undefined} /> :
           (
             <Box textAlign='center' mt={8} mb={8} h='60%' display='flex' alignItems='center' justifyContent='center'>
               {
@@ -210,7 +199,7 @@ function App() {
           )
         }
         <Box textAlign='center' mt={8} mb={8}>
-          <a href="https://codad5.dev" target="_blank" rel="noreferrer">
+          <a href="https://codad5.me" target="_blank" rel="noreferrer">
             codad5
           </a>
           <span> © {new Date().getFullYear()}</span>
