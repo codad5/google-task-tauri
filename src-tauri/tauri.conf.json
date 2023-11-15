@@ -4,10 +4,10 @@
     "beforeBuildCommand": "npm run build",
     "devPath": "http://localhost:1420",
     "distDir": "../dist",
-    "withGlobalTauri": false
+    "withGlobalTauri": true
   },
   "package": {
-    "productName": "google-task",
+    "productName": "Google Task",
     "version": "0.0.0"
   },
   "tauri": {
@@ -24,6 +24,9 @@
         "message": true,
         "open": false,
         "save": false
+      },
+      "notification": {
+        "all": true 
       },
       "fs": {
         "all": true,
@@ -68,7 +71,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "google-task",
+        "title": "Google Task",
         "width": 800,
         "height": 600
       }

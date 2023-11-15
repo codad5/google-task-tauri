@@ -4,29 +4,19 @@ import { CheckIcon } from "@chakra-ui/icons";
 import { taskCategory, task } from "../types/taskapi";
 import { Task } from "../helpers/task";
 
+const Taskobject  = new Task()
 
 export default function TaskPage({access_token}: {access_token?: string}) {
   const [taskCategories, setTaskCategories] = useState<taskCategory[]>([])
   const [activeTaskCategory, setActiveTaskCategory] = useState<number>(0)
   const inputRef = useRef<HTMLInputElement>(null)
-  const taskObjectRef = useRef<Task | null>(null);
-
-  // Create a state for the Task object
-  const [Taskobject, setTaskObject] = useState<Task | null>(null);
-
-  // Initialize the Task object only once
-  useEffect(() => {
-    if (!Taskobject) {
-      setTaskObject(new Task(access_token || ''));
-    }
-  }, [access_token, Taskobject]);
+  Taskobject.setAccessToken(access_token || '')
+  
 
   useEffect(() => {
-    Taskobject?.getTaskCategories().then(() => {
-        Taskobject?.getTasksByCategoryPosition(activeTaskCategory).then(() => {
-          // console.log('setting tasks')
-          // console.log(Taskobject.getTasks)
-          setTaskCategories(Taskobject?.getTasks)
+    Taskobject.getTaskCategories().then(() => {
+        Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
+          setTaskCategories(Taskobject.getTasks)
         })
       })
   console.log(taskCategories[activeTaskCategory], "active task category")
@@ -46,7 +36,7 @@ export default function TaskPage({access_token}: {access_token?: string}) {
       })
     newTaskCategory.tasks = newTasks;
     old[activeTaskCategory] = newTaskCategory
-    Taskobject?.markTask(task, newTaskCategory.id)
+    Taskobject.markTask(task, newTaskCategory.id)
     setTaskCategories([...old])
     setActiveTaskCategory(old => old)
   }
@@ -67,7 +57,7 @@ export default function TaskPage({access_token}: {access_token?: string}) {
             dueDate: new Date(),
             completed: false
         }
-        await Taskobject?.addToTask(newTask, newTaskCategory.id)
+        await Taskobject.addToTask(newTask, newTaskCategory.id)
         newTaskCategory.tasks?.push(newTask)
         old[activeTaskCategory] = newTaskCategory
         setTaskCategories([...old])

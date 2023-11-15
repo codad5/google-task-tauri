@@ -4,6 +4,26 @@ import TaskPage from "./components/TaskPage";
 import { listen } from "@tauri-apps/api/event";
 import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken } from "./helpers/auth";
 import { AccessToken, UserProfile } from "./types/googleapis";
+import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/api/notification';
+
+
+
+isPermissionGranted().then((granted) => {
+  if (!granted) {
+    requestPermission().then((granted) => {
+      if (!granted) {
+        console.log("permission not granted");
+        return;
+      }
+    });
+  }
+  console.log("permission granted");
+  sendNotification({
+    title: "Google Tasks Desktop",
+    body: "Thanks for using Google Tasks Desktop",
+  });
+});
+
 
 
 function App() {
