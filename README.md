@@ -24,11 +24,21 @@ npm run launch:dev
 - [x] Login Page
 - [x] Task Page
 - [x] Add Task
+    - [ ] Add Task Description
+    - [ ] Add Task Due Date/ Time
+    - [ ] Add Sub Task
+    - [ ] Ability to star/ unstar task
 - [ ] Delete Task
 - [x] Update Task
 - [ ] Add Task Category
 - [ ] Delete Task Category
 - [ ] Update Task Category
+- [ ] Add Global Shortcuts 
+    - [ ] Add Task Shortcut
+    - [ ] Show/ Hide App Shortcut
+- [ ] Notifications
+    - [ ] Task Due Date/ Time Notification
+    - [ ] Task Reminder Notification
 
 ## TECH STACK
 ### Tauri + React + Typescript + Chakra-ui
