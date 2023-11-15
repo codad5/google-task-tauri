@@ -24,6 +24,10 @@ npm run launch:dev
 - [x] Login Page
 - [x] Task Page
 - [x] Add Task
+    - [ ] Add Task Description
+    - [ ] Add Task Due Date/ Time
+    - [ ] Add Sub Task
+    - [ ] Ability to star/ unstar task
 - [ ] Delete Task
 - [x] Update Task
 - [ ] Add Task Category
