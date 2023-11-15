@@ -19,7 +19,7 @@ export default function TaskPage2({access_token}: {access_token?: string}) {
       setTaskCategoryList(data)
       if (data.length > 0) setActiveTaskCategory(0)
       return data
-    }).then((data) => {
+    }).then(() => {
       Taskobject.getTasksByCategoryPosition(activeTaskCategory >= 0 ? activeTaskCategory : 0).then((data) => {
         setActiveCategoryTasks(data)
       })
