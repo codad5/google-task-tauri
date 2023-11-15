@@ -6,7 +6,7 @@ import { Task } from "../helpers/task";
 
 
 const Taskobject = new Task('')
-export default function TaskPage2({access_token}: {access_token?: string}) {
+export default function TaskPage({access_token}: {access_token?: string}) {
   const [taskCategoryList, setTaskCategoryList] = useState<taskCategory[]>([])
   const [activeTaskCategory, setActiveTaskCategory] = useState<number>(-1)
   const TitleinputRef = useRef<HTMLInputElement>(null)
@@ -36,7 +36,7 @@ export default function TaskPage2({access_token}: {access_token?: string}) {
 
   const handleTaskCheck = (task: task) => {
     Taskobject.markTask({...task, completed: !task.completed}, taskCategoryList[activeTaskCategory].id).then(() => {
-      Taskobject.getTasksByCategoryPosition(activeTaskCategory).then((data) => {
+      Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
         setActiveCategoryTasks(active => {
           return active.map((t) => {
             if (t.id === task.id) return {...t, completed: !t.completed}

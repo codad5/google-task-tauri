@@ -6,7 +6,7 @@ import { Task } from "../helpers/task";
 
 
 const Taskobject = new Task('')
-export default function TaskPage({access_token}: {access_token?: string}) {
+export default function TaskPageOld({access_token}: {access_token?: string}) {
   Taskobject.setAccessToken(access_token || '')
   const [taskCategories, setTaskCategories] = useState<taskCategory[]>([])
   const [activeTaskCategory, setActiveTaskCategory] = useState<number>(0)

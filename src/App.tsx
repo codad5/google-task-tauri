@@ -1,11 +1,10 @@
 import { useState , useEffect} from "react";
 import { Avatar, Box, Button, Spinner, Wrap, WrapItem, useColorMode, Popover, useToast  , PopoverTrigger, Portal, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader  } from '@chakra-ui/react'
-import TaskPage from "./components/TaskPageOld";
 import { listen } from "@tauri-apps/api/event";
 import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken } from "./helpers/auth";
 import { AccessToken, UserProfile } from "./types/googleapis";
 import { disableMenu, pushNotification } from "./helpers/windowhelper";
-import TaskPage2 from "./components/TaskPage";
+import TaskPage from "./components/TaskPage";
 
 // disable default context menu on build
 disableMenu();
@@ -187,7 +186,7 @@ function App() {
                 </WrapItem>
             </Wrap>
         </Box>
-        {loggedIn ? <TaskPage2 access_token={accessToken ?? undefined} /> :
+        {loggedIn ? <TaskPage access_token={accessToken ?? undefined} /> :
           (
             <Box textAlign='center' mt={8} mb={8} h='60%' display='flex' alignItems='center' justifyContent='center'>
               {
