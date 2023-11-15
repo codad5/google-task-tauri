@@ -5,8 +5,10 @@ import { listen } from "@tauri-apps/api/event";
 import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken } from "./helpers/auth";
 import { AccessToken, UserProfile } from "./types/googleapis";
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/api/notification';
+import { disableMenu } from "./helpers/windowhelper";
 
-
+// disable default context menu on build
+disableMenu();
 
 isPermissionGranted().then((granted) => {
   if (!granted) {
