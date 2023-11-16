@@ -142,10 +142,12 @@ export async function getAuthCode() {
 
 export async function saveAccessToken(accessToken: string|AccessToken) {
     try {
-        const accessTokenText : string = typeof accessToken === "string" ? accessToken : JSON.stringify(accessToken);
-        return await writeTextFile(STORAGE_PATHS.access_token, accessTokenText, { dir: DEFAULT_DIRECTORY });
+        const accessTokenText: string = typeof accessToken === "string" ? accessToken : JSON.stringify(accessToken);
+        localStorage.setItem("lastLogin", Date.now() + "");
+        return await writeTextFile(STORAGE_PATHS.access_token, accessTokenText, { dir: DEFAULT_DIRECTORY }) 
     } catch (error) {
         console.error("Error saving access token:", error);
+        localStorage.removeItem("lastLogin");
         throw new Error("Error saving access token");
     }
 }
@@ -157,7 +159,9 @@ export async function getAccessTokenFromStorage() {
         const accessTokenText = await readTextFile(STORAGE_PATHS.access_token, { dir: DEFAULT_DIRECTORY });
         let accessToken = JSON.parse(accessTokenText) as AccessToken;
         // check if the access token is expired
-        if (accessToken.expiry_in < Date.now()) {
+        console.log(accessToken, "accessToken");
+        const lastLogin = parseInt(localStorage.getItem("lastLogin") || "0");
+        if (accessToken.expiry_in < Date.now() || Date.now() - lastLogin > 3620) {
             console.log("Access token expired");
             accessToken = await refreshAndSaveAccessToken(accessToken.refresh_token);
         }
