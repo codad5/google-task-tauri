@@ -1,16 +1,15 @@
 import { invoke, shell } from "@tauri-apps/api";
 import axios from "axios";
 import { AccessToken, UserProfile } from "../types/googleapis";
-import { BaseDirectory, readTextFile, removeFile, writeTextFile } from "@tauri-apps/api/fs";
-import { CLIENT_ID, CLIENT_SECRET } from "../assets/credentials";
+import { readTextFile, removeFile, writeTextFile } from "@tauri-apps/api/fs";
+import { CLIENT_ID, CLIENT_SECRET } from "../config/credentials";
+import settings from "../config/settings";
 
 
-const DEFAULT_DIRECTORY = BaseDirectory.AppLocalData;
-const GOOGLE_OAUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
-const SCOPE = "https://www.googleapis.com/auth/tasks " +
-  "https://www.googleapis.com/auth/userinfo.profile " +
-  "https://www.googleapis.com/auth/userinfo.email";
-
+const DEFAULT_DIRECTORY = settings.fs.DEFAULT_DIRECTORY;
+const GOOGLE_OAUTH_ENDPOINT = settings.auth.GOOGLE_OAUTH_ENDPOINT;
+const SCOPE = settings.auth.SCOPE;
+const STORAGE_PATHS = settings.storage.paths;
 // anonymous class for managing port
 class PortManager {
     private port ?: number;
@@ -124,7 +123,7 @@ export async function openAuthWindow() {
 // save the auth code to storage
 export async function saveAuthCode(code: string) {
     try {
-        return await writeTextFile("auth_code.txt", code, { dir: DEFAULT_DIRECTORY });
+        return await writeTextFile(STORAGE_PATHS.authcode, code, { dir: DEFAULT_DIRECTORY });
     } catch (error) {
         console.error("Error saving auth code:", error);
         throw new Error("Error saving auth code");
@@ -134,7 +133,7 @@ export async function saveAuthCode(code: string) {
 // get the auth code from storage
 export async function getAuthCode() {
     try {
-        return await readTextFile("auth_code.txt", { dir: DEFAULT_DIRECTORY });
+        return await readTextFile(STORAGE_PATHS.authcode, { dir: DEFAULT_DIRECTORY });
     } catch (error) {
         console.error("Error getting auth code:", error);
         return null;
@@ -144,7 +143,7 @@ export async function getAuthCode() {
 export async function saveAccessToken(accessToken: string|AccessToken) {
     try {
         const accessTokenText : string = typeof accessToken === "string" ? accessToken : JSON.stringify(accessToken);
-        return await writeTextFile("access_token.json", accessTokenText, { dir: DEFAULT_DIRECTORY });
+        return await writeTextFile(STORAGE_PATHS.access_token, accessTokenText, { dir: DEFAULT_DIRECTORY });
     } catch (error) {
         console.error("Error saving access token:", error);
         throw new Error("Error saving access token");
@@ -155,7 +154,7 @@ export async function saveAccessToken(accessToken: string|AccessToken) {
 
 export async function getAccessTokenFromStorage() {
     try {
-        const accessTokenText = await readTextFile("access_token.json", { dir: DEFAULT_DIRECTORY });
+        const accessTokenText = await readTextFile(STORAGE_PATHS.access_token, { dir: DEFAULT_DIRECTORY });
         let accessToken = JSON.parse(accessTokenText) as AccessToken;
         // check if the access token is expired
         if (accessToken.expiry_in < Date.now()) {
@@ -172,7 +171,7 @@ export async function getAccessTokenFromStorage() {
 
 export async function deleteAccessToken() {
     try {
-        return await removeFile("access_token.json", { dir: DEFAULT_DIRECTORY });
+        return await removeFile(STORAGE_PATHS.access_token, { dir: DEFAULT_DIRECTORY });
     } catch (error) {
         console.error("Error deleting access token:", error);
         throw new Error("Error deleting access token");
@@ -181,7 +180,7 @@ export async function deleteAccessToken() {
 
 export async function saveUserProfile(userProfile: UserProfile) {
     try {
-        return await writeTextFile("user_profile.json", JSON.stringify(userProfile), { dir: DEFAULT_DIRECTORY });
+        return await writeTextFile(STORAGE_PATHS.user_profile, JSON.stringify(userProfile), { dir: DEFAULT_DIRECTORY });
     } catch (error) {
         console.error("Error saving user profile:", error);
         throw new Error("Error saving user profile");
@@ -190,7 +189,7 @@ export async function saveUserProfile(userProfile: UserProfile) {
 
 export async function getUserProfileFromStorage() {
     try {
-        const userProfile = await readTextFile("user_profile.json", { dir: DEFAULT_DIRECTORY });
+        const userProfile = await readTextFile(STORAGE_PATHS.user_profile, { dir: DEFAULT_DIRECTORY });
         return JSON.parse(userProfile) as UserProfile;
     } catch (error) {
         console.error("Error getting user profile:", error);

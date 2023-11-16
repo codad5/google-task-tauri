@@ -13,3 +13,5 @@ export interface AccessToken {
   id_token: string;
 }
 
+export type GoogleServices = 'tasks' | 'oauth2' 
+

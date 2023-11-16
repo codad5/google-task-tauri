@@ -72,7 +72,8 @@ export default function TaskPage({access_token}: {access_token?: string}) {
             completed: false
     }
     // preupdate the task state to reflect the change
-    setActiveCategoryTasks(active => [...active, newTask])
+    setActiveCategoryTasks(active => [newTask, ...active])
+    clearInput()
     Taskobject.addToTask(newTask, taskCategoryList[activeTaskCategory].id)
       .then(() => { Taskobject.clearPositionCache(activeTaskCategory) })
       .then(() => {
@@ -81,10 +82,13 @@ export default function TaskPage({access_token}: {access_token?: string}) {
       })
         .finally(() => {
           console.log('done adding')
-          TitleinputRef.current!.value = ''
         })
     })
         
+  }
+
+  function clearInput() {
+    TitleinputRef.current!.value = ''
   }
 
   return (
