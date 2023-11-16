@@ -1,5 +1,4 @@
 import { readTextFile } from "@tauri-apps/api/fs";
-import { CLIENT_ID, CLIENT_SECRET } from "../config/credentials";
 import settings from "../config/settings";
 import { AccessToken, GoogleServices } from "../types/googleapis";
 import axios, { AxiosInstance } from "axios";
@@ -9,8 +8,6 @@ const STORAGE_PATHS = settings.storage.paths;
 const DEFAULT_DIRECTORY = settings.fs.DEFAULT_DIRECTORY;
 
 class _GoogleApiHelper {
-    private static instance: _GoogleApiHelper;
-    private access_token?: AccessToken;
     private axiosInstance: AxiosInstance;
     private BASE_URL: `https://${GoogleServices}.googleapis.com/${string}`;
 
