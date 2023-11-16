@@ -99,7 +99,7 @@ export default function TaskPage({access_token}: {access_token?: string}) {
                     <Checkbox isChecked={task.completed} onChange={() => handleTaskCheck(task)}>{task.name}</Checkbox>
                   </Box>
               ))}
-            {
+            { taskCategoryList.length > 0 && activeTaskCategory >= 0 &&
              (
                 <form onSubmit={handleAddTask} >
                   <Wrap p="2" spacing="30px">
