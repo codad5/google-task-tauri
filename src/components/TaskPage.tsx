@@ -35,15 +35,6 @@ export default function TaskPage({access_token}: {access_token?: string}) {
   }, [activeTaskCategory])
 
   const handleTaskCheck = (task: task) => {
-
-    // reupdate the task state to reflect the change
-    setActiveCategoryTasks(active => {
-      return active.map((t) => {
-        if (t.id === task.id) return {...t, completed: !t.completed}
-        return t
-      })
-    })
-    
     Taskobject.markTask({...task, completed: !task.completed}, taskCategoryList[activeTaskCategory].id).then(() => {
       Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
         setActiveCategoryTasks(active => {
