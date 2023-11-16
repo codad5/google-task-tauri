@@ -38,7 +38,6 @@ export async function getAccessToken(code: string) : Promise<AccessToken> {
         };
         console.log(data, "data");
         const response = await axios.post("https://oauth2.googleapis.com/token", data);
-        // Extract and set the access token in the state
         console.log(response, "response from getAccessToken");
         return response.data;
     }
@@ -48,6 +47,47 @@ export async function getAccessToken(code: string) : Promise<AccessToken> {
     }
 
 }
+
+export async function refreshAccessToken(refreshToken: string) : Promise<AccessToken> {
+    try {
+        const data = {
+            refresh_token: refreshToken,
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            grant_type: "refresh_token",
+        };
+        const response = await axios.post("https://oauth2.googleapis.com/token", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error refreshing access token:", error);
+        throw new Error("Error refreshing access token");
+    }
+}
+
+export async function refreshAndSaveAccessToken(refreshToken: string): Promise<AccessToken> {
+    try {
+        const accessToken = await refreshAccessToken(refreshToken);
+        await saveAccessToken(accessToken);
+        return accessToken;
+    } catch (error) {
+        console.error("Error refreshing and saving access token:", error);
+        throw new Error("Error refreshing and saving access token");
+    }
+}
+
+export async function revokeAccessToken(accessToken: string) {
+    try {
+        const data = {
+            token: accessToken,
+        };
+        const response = await axios.post("https://oauth2.googleapis.com/revoke", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error revoking access token:", error);
+        throw new Error("Error revoking access token");
+    }
+}
+
 
 
 export async function fetchUserProfile(accessToken : string) : Promise<UserProfile> {
@@ -72,6 +112,7 @@ export async function openAuthWindow() {
     // create and set a new URL object with the endpoint and query parameters
     const url = new URL(GOOGLE_OAUTH_ENDPOINT);
     url.searchParams.append("scope", SCOPE);
+    url.searchParams.append("access_type", "offline");
     url.searchParams.append("response_type", "code");
     url.searchParams.append("client_id", CLIENT_ID);
     url.searchParams.append("redirect_uri", getLocalHostUrl(await portManager.getPort()));
@@ -100,9 +141,10 @@ export async function getAuthCode() {
     }
 }
 
-export async function saveAccessToken(accessToken: string) {
+export async function saveAccessToken(accessToken: string|AccessToken) {
     try {
-        return await writeTextFile("access_token.json", accessToken, { dir: DEFAULT_DIRECTORY });
+        const accessTokenText : string = typeof accessToken === "string" ? accessToken : JSON.stringify(accessToken);
+        return await writeTextFile("access_token.json", accessTokenText, { dir: DEFAULT_DIRECTORY });
     } catch (error) {
         console.error("Error saving access token:", error);
         throw new Error("Error saving access token");
@@ -113,8 +155,14 @@ export async function saveAccessToken(accessToken: string) {
 
 export async function getAccessTokenFromStorage() {
     try {
-        const access_token = await readTextFile("access_token.json", { dir: DEFAULT_DIRECTORY });
-        return JSON.parse(access_token) as AccessToken;
+        const accessTokenText = await readTextFile("access_token.json", { dir: DEFAULT_DIRECTORY });
+        let accessToken = JSON.parse(accessTokenText) as AccessToken;
+        // check if the access token is expired
+        if (accessToken.expiry_in < Date.now()) {
+            console.log("Access token expired");
+            accessToken = await refreshAndSaveAccessToken(accessToken.refresh_token);
+        }
+        return accessToken;
     } catch (error) {
         console.error("Error getting access token:", error);
         return null;
