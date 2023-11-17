@@ -52,10 +52,8 @@ export default function TaskPage({access_token}: {access_token?: string}) {
   }
 
   const handleAddTask = async (e : React.FormEvent<HTMLFormElement>) => {
-    console.log('adding task')
     e.preventDefault();
     if (!TitleinputRef.current) return;
-    console.log(TitleinputRef.current.value)
     if (TitleinputRef.current.value === '') return;
     console.log('adding task 2' , activeTaskCategory)
     if (activeTaskCategory < 0) return;
