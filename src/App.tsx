@@ -133,13 +133,17 @@ function App() {
   }
 
   useEffect(() => {
-    if (attemptedLogin) handleLogin();
-    setAttemptedLogin(false);
+    if (attemptedLogin) {
+      handleLogin();
+      setAttemptedLogin(false);
+    }
   }, [attemptedLogin])
 
   useEffect(() => {
-    if (attemptedLogout) handleLogout();
-    setAttemptedLogout(false);
+    if (attemptedLogout) {
+      handleLogout();
+      setAttemptedLogout(false);
+    }
   }, [attemptedLogout])
 
   
