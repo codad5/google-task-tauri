@@ -26,7 +26,7 @@ function App() {
   const setProfile = useSetRecoilState<UserProfile | null>(userProfileState);
   const setAccessToken = useSetRecoilState<string | null>(accessTokenState);
   const [attemptedLogin, setAttemptedLogin] = useRecoilState<boolean>(attemptLoginState);
-  const [attemptedLogout, _setAttemptedLogout] = useRecoilState<boolean>(attemptLogoutState);
+  const [attemptedLogout, setAttemptedLogout] = useRecoilState<boolean>(attemptLogoutState);
   // error message toast
   const toast = useToast()
 
@@ -134,11 +134,12 @@ function App() {
 
   useEffect(() => {
     if (attemptedLogin) handleLogin();
-    
+    setAttemptedLogin(false);
   }, [attemptedLogin])
 
   useEffect(() => {
     if (attemptedLogout) handleLogout();
+    setAttemptedLogout(false);
   }, [attemptedLogout])
 
   
