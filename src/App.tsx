@@ -61,14 +61,16 @@ function App() {
   useEffect(() => {
     getAccessTokenFromStorage().then((accessToken) => {
       if (accessToken) {
+        pushNotification("Login Successful")
         if (navigator.onLine) {
           fetchUserProfile(accessToken.access_token).then((profile) => {
-          if (profile) {
-            setProfile(profile);
-            setAccessToken(accessToken.access_token);
-            setLoggedIn(true);
-          }
-        });
+            if (profile) {
+              setProfile(profile);
+              setAccessToken(accessToken.access_token);
+              setLoggedIn(true);
+              pushNotification(`welcome back ${profile.name}`)
+            }
+          });
         }
         else {
           getUserProfileFromStorage().then((profile) => {
@@ -76,6 +78,7 @@ function App() {
             setProfile(profile);
             setAccessToken(accessToken.access_token);
             setLoggedIn(true);
+            pushNotification(`welcome back ${profile.name}`)
           }
           });
         }
@@ -129,8 +132,10 @@ function App() {
       const storedAccessToken = await getAccessTokenFromStorage();
       if (storedAccessToken) {
         handleLoadFrom(storedAccessToken);
+        pushNotification('Login Successful')
         return;
       }
+      pushNotification('login required')
       await openAuthWindow();
     } catch (error) {
       console.log(error);

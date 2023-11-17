@@ -1,5 +1,5 @@
 import { useState , useEffect, useRef} from "react";
-import { Tabs, TabList, TabPanels, Tab, Box, Checkbox, Input, IconButton, Wrap, WrapItem} from '@chakra-ui/react'
+import { Tabs, TabList, TabPanels, Tab, Box, Checkbox, Input, IconButton, Wrap, WrapItem, Spinner} from '@chakra-ui/react'
 import { CheckIcon } from "@chakra-ui/icons";
 import { taskCategory, task } from "../types/taskapi";
 import { Task } from "../helpers/task";
@@ -12,6 +12,7 @@ export default function TaskPage({access_token}: {access_token?: string}) {
   const TitleinputRef = useRef<HTMLInputElement>(null)
   const DescriptionInputRef = useRef<HTMLInputElement>(null)
   const [activeCategoryTasks, setActiveCategoryTasks] = useState<task[]>([])
+  const [loading, setloading] = useState(true)
   
   useEffect(() => {
     Taskobject.setAccessToken(access_token || '')
@@ -22,15 +23,18 @@ export default function TaskPage({access_token}: {access_token?: string}) {
     }).then(() => {
       Taskobject.getTasksByCategoryPosition(activeTaskCategory >= 0 ? activeTaskCategory : 0).then((data) => {
         setActiveCategoryTasks(data)
+        setloading(false)
       })
     })
 
   }, []) 
 
   useEffect(() => {
+    setloading(true)
     if (activeTaskCategory < 0) return;
     Taskobject.getTasksByCategoryPosition(activeTaskCategory).then((data) => {
       setActiveCategoryTasks(data)
+      setloading(false)
     })
   }, [activeTaskCategory])
 
@@ -91,7 +95,9 @@ export default function TaskPage({access_token}: {access_token?: string}) {
                 {taskCategory?.name}
               </Tab>
             ))}
-          </TabList>
+        </TabList>
+        {
+          loading ? <Spinner size='xl' /> : (
           <Box p={4} h='90%'>
             <TabPanels>
               {activeCategoryTasks.map((task, key) => (
@@ -137,7 +143,9 @@ export default function TaskPage({access_token}: {access_token?: string}) {
               )
             }
             </TabPanels>
-          </Box>
+            </Box>
+          )
+        }
         </Tabs>
     </div>
   );

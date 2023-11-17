@@ -161,7 +161,7 @@ export async function getAccessTokenFromStorage() {
         // check if the access token is expired
         console.log(accessToken, "accessToken");
         const lastLogin = parseInt(localStorage.getItem("lastLogin") || "0");
-        if (accessToken.expiry_in < Date.now() || Date.now() - lastLogin > 3620) {
+        if ((accessToken.expiry_in < Date.now() || Date.now() - lastLogin > 3620) && navigator.onLine){
             console.log("Access token expired");
             accessToken = await refreshAndSaveAccessToken(accessToken.refresh_token);
         }
