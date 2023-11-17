@@ -30,18 +30,21 @@ const AddTaskForm = () => {
                 completed: false
         }
         // preupdate the task state to reflect the change
+        const old = activeCategoryTasks
         setActiveCategoryTasks(active => [newTask, ...active])
         clearForm()
         Taskobject.addToTask(newTask, taskCategoryList[activeTaskCategory].id)
-        .then(() => { Taskobject.clearPositionCache(activeTaskCategory) })
-        .then(() => {
-        Taskobject.getTasksByCategoryPosition(activeTaskCategory).then((data) => {
-            setActiveCategoryTasks(data)
-        })
-            .finally(() => {
-            console.log('done adding')
+            .then(() => { Taskobject.clearPositionCache(activeTaskCategory) })
+            .then(() => {
+                Taskobject.getTasksByCategoryPosition(activeTaskCategory).then((data) => {
+                    setActiveCategoryTasks(data)
+                }).finally(() => {
+                    console.log('done adding')
+                })
+            }).catch((err) => {
+                console.log('error adding task', err)
+                setActiveCategoryTasks(old)
             })
-        })
             
     }
 
