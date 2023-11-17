@@ -12,19 +12,6 @@ export default function TaskList() {
     const [activeCategoryTasks, setActiveCategoryTasks] = useRecoilState<task[]>(activeCategoryTasksState)
 
 
-    const handleTaskCheck = (task: task) => {
-    Taskobject.markTask({...task, completed: !task.completed}, taskCategoryList[activeTaskCategory].id).then(() => {
-      Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
-        setActiveCategoryTasks(active => {
-          return active.map((t) => {
-            if (t.id === task.id) return {...t, completed: !t.completed}
-            return t
-          })
-        })
-      })
-    }).finally(() => { Taskobject.clearPositionCache(activeTaskCategory) })
-  }
-
     return (
         <div>
           {activeCategoryTasks.map((task, key) => <TaskItem key={key} task={task}  />)}
