@@ -1,20 +1,32 @@
 
 import { CheckIcon } from "@chakra-ui/icons";
 import { Wrap, WrapItem, Input, IconButton } from "@chakra-ui/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { taskObjectState, taskCategoriesListSelector, activeTaskCategorySelector, activeCategoryTasksState } from "../../config/states";
 import { taskCategory, task } from "../../types/taskapi";
+import { register } from "@tauri-apps/api/globalShortcut";
 
 const AddTaskForm = () => {
     const TitleinputRef = useRef<HTMLInputElement>(null)
     const DescriptionInputRef = useRef<HTMLInputElement>(null)
-
-
     const Taskobject = useRecoilValue(taskObjectState) 
     const taskCategoryList = useRecoilValue<taskCategory[]>(taskCategoriesListSelector)
     const activeTaskCategory = useRecoilValue<number>(activeTaskCategorySelector)
     const [activeCategoryTasks, setActiveCategoryTasks] = useRecoilState<task[]>(activeCategoryTasksState)
+
+    useEffect(() => {
+        // register shortcut to add task
+        register('CommandOrControl+Shift+C', () => {
+            console.log('Shortcut triggered');
+            if (!TitleinputRef.current) return;
+            TitleinputRef.current.focus()
+        }).then(() => {
+            console.log('Shortcut registered');
+        }).catch((err) => {
+            console.log('Shortcut registration failed', err);
+        });
+    }, [])
 
     const handleAddTask = async (e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

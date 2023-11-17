@@ -17,6 +17,9 @@
         "all": false,
         "open": true
       },
+      "globalShortcut": {
+        "all": true 
+      },
       "dialog": {
         "all": false,
         "ask": true,
