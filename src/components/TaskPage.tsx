@@ -97,7 +97,7 @@ export default function TaskPage({access_token}: {access_token?: string}) {
             ))}
         </TabList>
         {
-          loading ? <Box p={4} h='90%' d='flex' justifyContent='center' alignItems='center'>
+          loading ? <Box p={4} h='90%' display='flex' justifyContent='center' alignItems='center'>
             <Spinner size='xl' /> 
           </Box> : (
           <Box p={4} h='90%'>
