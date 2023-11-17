@@ -49,8 +49,8 @@ const AddTaskForm = () => {
     }
 
     function clearForm() {
-        TitleinputRef.current!.value = '';
-        DescriptionInputRef.current!.value = '';
+        if (TitleinputRef.current) TitleinputRef.current.value = ''
+        if (DescriptionInputRef.current) DescriptionInputRef.current.value = ''
     }
     return (
         <form onSubmit={handleAddTask}>
