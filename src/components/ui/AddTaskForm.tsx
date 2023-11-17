@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { taskObjectState, taskCategoriesListSelector, activeTaskCategorySelector, activeCategoryTasksState } from "../../config/states";
 import { taskCategory, task } from "../../types/taskapi";
-import { register } from "@tauri-apps/api/globalShortcut";
+import { isRegistered, register } from "@tauri-apps/api/globalShortcut";
 
 const AddTaskForm = () => {
     const TitleinputRef = useRef<HTMLInputElement>(null)
@@ -17,15 +17,19 @@ const AddTaskForm = () => {
 
     useEffect(() => {
         // register shortcut to add task
-        register('CommandOrControl+Shift+C', () => {
-            console.log('Shortcut triggered');
-            if (!TitleinputRef.current) return;
-            TitleinputRef.current.focus()
-        }).then(() => {
-            console.log('Shortcut registered');
-        }).catch((err) => {
-            console.log('Shortcut registration failed', err);
-        });
+        isRegistered('CommandOrControl+Shift+N').then((data) => {
+            if (data) return;
+            console.log('registering shortcut')
+            register('CommandOrControl+Shift+N', () => {
+                console.log('Shortcut triggered');
+                if (!TitleinputRef.current) return;
+                TitleinputRef.current.focus()
+            }).then(() => {
+                console.log('Shortcut registered');
+            }).catch((err) => {
+                console.log('Shortcut registration failed', err);
+            });
+        })
     }, [])
 
     const handleAddTask = async (e : React.FormEvent<HTMLFormElement>) => {
