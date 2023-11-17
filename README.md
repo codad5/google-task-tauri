@@ -39,6 +39,11 @@ npm run launch:dev
 - [ ] Notifications
     - [ ] Task Due Date/ Time Notification
     - [ ] Task Reminder Notification
+- [x] Add Proper State Management (Recoil)
+- [ ] Add Offline Support
+    - [ ] Add Offline Storage 
+    - [ ] Sync Offline Storage with Google Task once internet connection is available
+
 
 ## TECH STACK
 ### Tauri + React + Typescript + Chakra-ui
