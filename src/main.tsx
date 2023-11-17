@@ -6,7 +6,7 @@ import { RecoilRoot } from "recoil";
 // use dark mode by default or based on system preferences
 const config : ThemeConfig = {
   initialColorMode: "dark",
-  useSystemColorMode: false,
+  useSystemColorMode: true,
 }
 const theme = extendTheme({ config })
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

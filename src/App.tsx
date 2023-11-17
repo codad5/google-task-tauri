@@ -5,7 +5,6 @@ import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWi
 import { AccessToken, UserProfile } from "./types/googleapis";
 import { disableMenu, pushNotification } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
-
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { accessTokenState, attemptLoginState, attemptLogoutState, loggedInState, userProfileState } from "./config/states";
 import Header from "./components/ui/Header";
