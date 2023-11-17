@@ -2,15 +2,15 @@ import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 import axios from "axios";
 import { task, taskCategory } from "../types/taskapi";
 import { BaseDirectory } from "@tauri-apps/api/fs";
-import { CacheManager } from "./cacher";
+import { GlobalCacheManager } from "./cacher";
 const DEFAULT_DIRECTORY = BaseDirectory.AppLocalData
 
 
 
 
 
-class taskCategoryCacheManager extends CacheManager<taskCategory[]> {
-    private tasklastUpdate: CacheManager<{ [key: string]: Date }> = new CacheManager<{ [key: string]: Date }>("tasklastUpdate");
+class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
+    private tasklastUpdate: GlobalCacheManager<{ [key: string]: Date }> = new GlobalCacheManager<{ [key: string]: Date }>("tasklastUpdate");
     constructor() {
         super("taskCategoryList");
     }

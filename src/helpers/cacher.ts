@@ -30,22 +30,22 @@ class Cache  <T = any> {
 
 }
 
-const Cacher = new Cache();
+const _GloablCacher = new Cache();
 
-class CacheManager <T = any> {
+class GlobalCacheManager <T = any> {
     private key: string = "default";
 
     constructor(key?: string) {
         if (key) this.key = key;
-        Cacher.set(this.key, null);
+        _GloablCacher.set(this.key, null);
     }
 
     get() : T {
-        return Cacher.get(this.key);
+        return _GloablCacher.get(this.key);
     }
 
     set(value: T) {
-        Cacher.set(this.key, value);
+        _GloablCacher.set(this.key, value);
     }
 
     update(value: T) {
@@ -53,12 +53,12 @@ class CacheManager <T = any> {
     }
 
     lastUpdate() {
-        return Cacher.getLastUpdate(this.key);
+        return _GloablCacher.getLastUpdate(this.key);
     }
 
     clearCache() {
-        Cacher.clearCache(this.key);
+        _GloablCacher.clearCache(this.key);
     }
 }
 
-export {CacheManager, Cacher};
+export {GlobalCacheManager, Cache};
