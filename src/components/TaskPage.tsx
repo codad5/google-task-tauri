@@ -2,11 +2,18 @@ import { useState , useEffect, useRef} from "react";
 import { Tabs, TabList, TabPanels, Tab, Box, Checkbox, Input, IconButton, Wrap, WrapItem, Spinner} from '@chakra-ui/react'
 import { CheckIcon } from "@chakra-ui/icons";
 import { taskCategory, task } from "../types/taskapi";
-import { Task } from "../helpers/task";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { accessTokenSelector, taskObjectSelector, taskObjectState } from "../config/states";
 
 
-const Taskobject = new Task('')
-export default function TaskPage({access_token}: {access_token?: string}) {
+
+export default function TaskPage() {
+  const [Taskobject, setTaskobject] = useRecoilState(taskObjectState)
+  const access_token = useRecoilValue(accessTokenSelector)
+
+  if (!access_token) return <div>Not logged in</div>
+  
+  
   const [taskCategoryList, setTaskCategoryList] = useState<taskCategory[]>([])
   const [activeTaskCategory, setActiveTaskCategory] = useState<number>(-1)
   const TitleinputRef = useRef<HTMLInputElement>(null)
@@ -15,7 +22,6 @@ export default function TaskPage({access_token}: {access_token?: string}) {
   const [loading, setloading] = useState(true)
   
   useEffect(() => {
-    Taskobject.setAccessToken(access_token || '')
     Taskobject.getTaskCategories().then((data) => {
       setTaskCategoryList(data)
       if (data.length > 0) setActiveTaskCategory(0)

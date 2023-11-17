@@ -3,7 +3,7 @@ import axios from "axios";
 import { task, taskCategory } from "../types/taskapi";
 import { BaseDirectory } from "@tauri-apps/api/fs";
 const DEFAULT_DIRECTORY = BaseDirectory.AppLocalData
-export class Task {
+class Task {
     accessToken ?: string;
     baseUrl = "https://tasks.googleapis.com/tasks/v1";
     private tasksCategoryList: taskCategory[] = [];
@@ -221,3 +221,9 @@ export class Task {
         return this
     }
 }
+
+
+
+const taskObject = new Task();
+
+export { taskObject, Task };

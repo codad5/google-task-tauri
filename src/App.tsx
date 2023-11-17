@@ -6,6 +6,9 @@ import { AccessToken, UserProfile } from "./types/googleapis";
 import { disableMenu, pushNotification } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
 
+import { useRecoilState } from "recoil";
+import { accessTokenState, loggedInState, userProfileState } from "./config/states";
+
 // disable default context menu on build
 disableMenu();
 
@@ -17,11 +20,11 @@ pushNotification({
 })
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const { colorMode, toggleColorMode } = useColorMode()
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [loggedIn, setLoggedIn] = useRecoilState<boolean>(loggedInState);
+  const [profile, setProfile] = useRecoilState<UserProfile | null>(userProfileState);
+  const [accessToken, setAccessToken] = useRecoilState<string | null>(accessTokenState);
   // error message toast
   const toast = useToast()
 
@@ -191,7 +194,7 @@ function App() {
                 </WrapItem>
             </Wrap>
         </Box>
-        {loggedIn ? <TaskPage access_token={accessToken ?? undefined} /> :
+        {loggedIn ? <TaskPage  /> :
           (
             <Box textAlign='center' mt={8} mb={8} h='60%' display='flex' alignItems='center' justifyContent='center'>
               {
