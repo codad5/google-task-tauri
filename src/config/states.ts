@@ -1,6 +1,7 @@
 import { atom, selector } from 'recoil';
 import { UserProfile } from '../types/googleapis';
 import { Task } from '../helpers/task';
+import { task, taskCategory } from '../types/taskapi';
 
 const loggedInState = atom({
     key: 'loggedInState',
@@ -21,6 +22,22 @@ const taskObjectState = atom<Task>({
     key: 'taskObjectState',
     default:  new Task(),
 });
+
+const activeTaskCategoryState = atom<number>({
+    key: 'activeTaskCategoryState',
+    default: -1,
+});
+
+const activeCategoryTasksState = atom<task[]>({
+    key: 'activeCategoryTasksState',
+    default: [],
+});
+
+const taskCategoriesListState = atom<taskCategory[]>({
+    key: 'taskCategoriesListState',
+    default: [],
+});
+
 
 
 const loggedInSelector = selector({
@@ -60,6 +77,30 @@ const taskObjectSelector = selector({
     },
 });
 
+const activeTaskCategorySelector = selector({
+    key: 'activeTaskCategorySelector',
+    get: ({ get }) => {
+        const activeTaskCategory = get(activeTaskCategoryState);
+        return activeTaskCategory;
+    },
+});
+
+const activeCategoryTasksSelector = selector({
+    key: 'activeCategoryTasksSelector',
+    get: ({ get }) => {
+        const activeCategoryTasks = get(activeCategoryTasksState);
+        return activeCategoryTasks;
+    },
+});
+
+const taskCategoriesListSelector = selector({
+    key: 'taskCategoriesListSelector',
+    get: ({ get }) => {
+        const taskCategoriesList = get(taskCategoriesListState);
+        return taskCategoriesList;
+    },
+});
+
 
 export {
     loggedInState,
@@ -69,5 +110,12 @@ export {
     accessTokenState,
     accessTokenSelector,
     taskObjectState,
-    taskObjectSelector
+    taskObjectSelector,
+    activeTaskCategoryState,
+    activeTaskCategorySelector,
+    activeCategoryTasksState,
+    activeCategoryTasksSelector,
+    taskCategoriesListState,
+    taskCategoriesListSelector,
+
 };

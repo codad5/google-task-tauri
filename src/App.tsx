@@ -6,7 +6,7 @@ import { AccessToken, UserProfile } from "./types/googleapis";
 import { disableMenu, pushNotification } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
 
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { accessTokenState, loggedInState, userProfileState } from "./config/states";
 
 // disable default context menu on build
@@ -24,7 +24,7 @@ function App() {
   const { colorMode, toggleColorMode } = useColorMode()
   const [loggedIn, setLoggedIn] = useRecoilState<boolean>(loggedInState);
   const [profile, setProfile] = useRecoilState<UserProfile | null>(userProfileState);
-  const [accessToken, setAccessToken] = useRecoilState<string | null>(accessTokenState);
+  const setAccessToken = useSetRecoilState<string | null>(accessTokenState);
   // error message toast
   const toast = useToast()
 

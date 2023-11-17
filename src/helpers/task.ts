@@ -28,8 +28,7 @@ class taskCategoryCacheManager extends CacheManager<taskCategory[]> {
     }
 
     setTaskLastUpdate(positionOrCategoryID: number|string, date: Date) {
-        const tasklastUpdate = this.tasklastUpdate.get();
-        tasklastUpdate[positionOrCategoryID] = date;
+        const tasklastUpdate = { ...this.tasklastUpdate.get() , [positionOrCategoryID]: date };
         this.tasklastUpdate.update(tasklastUpdate);
     }
 
@@ -42,8 +41,9 @@ class taskCategoryCacheManager extends CacheManager<taskCategory[]> {
     }
 
     clearCache(positionOrCategoryID?: number | string) {
-        if (positionOrCategoryID) {
+        if (positionOrCategoryID !== undefined) {
             const tasklastUpdate = this.tasklastUpdate.get();
+            console.log(tasklastUpdate, "tasklastUpdate", positionOrCategoryID);
             delete tasklastUpdate[positionOrCategoryID];
             this.tasklastUpdate.update(tasklastUpdate);
         } else {
@@ -120,7 +120,7 @@ export class Task {
     }
 
     async saveTasksToFile(taskCategories?: taskCategory[]) {
-        const tobeSaved = taskCategories || this.tasksCategoryList;
+        const tobeSaved = taskCategories || this.tasksCategoryList.get();
         const tasks = JSON.stringify(tobeSaved);
         await writeTextFile("tasks.json", tasks, { dir: DEFAULT_DIRECTORY });
     }
@@ -185,6 +185,7 @@ export class Task {
     async getTasksByCategoryPositionFromFile(position: number): Promise<task[]> {
         const tasks = await readTextFile(`tasks.json`, { dir: DEFAULT_DIRECTORY });
         const taskCategories = JSON.parse(tasks);
+        console.log(taskCategories, "taskCategories");
         return taskCategories[position].tasks;
     }
 
@@ -279,7 +280,8 @@ export class Task {
     }
 
     async clearPositionCache(position: number) {
-        this.tasksCategoryList.clearCache();
+        console.log("clearing cache", position);
+        this.tasksCategoryList.clearCache(position);
         return this
     }
 }
