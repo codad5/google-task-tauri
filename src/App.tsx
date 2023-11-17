@@ -1,5 +1,5 @@
 import { useState , useEffect} from "react";
-import { Avatar, Box, Button, Spinner, Wrap, WrapItem, useColorMode, Popover, useToast  , PopoverTrigger, Portal, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader  } from '@chakra-ui/react'
+import { Box, Button, Spinner, useToast  } from '@chakra-ui/react'
 import { listen } from "@tauri-apps/api/event";
 import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken } from "./helpers/auth";
 import { AccessToken, UserProfile } from "./types/googleapis";
@@ -7,7 +7,8 @@ import { disableMenu, pushNotification } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
 
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { accessTokenState, loggedInState, userProfileState } from "./config/states";
+import { accessTokenState, attemptLoginState, attemptLogoutState, loggedInState, userProfileState } from "./config/states";
+import Header from "./components/ui/Header";
 
 // disable default context menu on build
 disableMenu();
@@ -21,13 +22,15 @@ pushNotification({
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
-  const { colorMode, toggleColorMode } = useColorMode()
   const [loggedIn, setLoggedIn] = useRecoilState<boolean>(loggedInState);
-  const [profile, setProfile] = useRecoilState<UserProfile | null>(userProfileState);
+  const setProfile = useSetRecoilState<UserProfile | null>(userProfileState);
   const setAccessToken = useSetRecoilState<string | null>(accessTokenState);
+  const [attemptedLogin, setAttemptedLogin] = useRecoilState<boolean>(attemptLoginState);
+  const [attemptedLogout, _setAttemptedLogout] = useRecoilState<boolean>(attemptLogoutState);
   // error message toast
   const toast = useToast()
 
+  
 
   // to generate a port and listen to it
   useEffect(() => {
@@ -129,6 +132,17 @@ function App() {
     setLoading(false)
   }
 
+  useEffect(() => {
+    if (attemptedLogin) handleLogin();
+    
+  }, [attemptedLogin])
+
+  useEffect(() => {
+    if (attemptedLogout) handleLogout();
+  }, [attemptedLogout])
+
+  
+
   async function handleLogin() {
     setLoading(true)
     try {
@@ -143,7 +157,6 @@ function App() {
     } catch (error) {
       console.log(error);
       setLoading(false)
-      await handleLogout();
       toast({
         title: "Error",
         description: "Error signing in",
@@ -161,46 +174,14 @@ function App() {
         <Box textAlign='center' mb={4}>
           <h1>Google Tasks Desktop</h1>
         </Box>
-        <Box textAlign='right'>
-            <Wrap spacing="30px" justify="flex-end">
-            <WrapItem>
-                {
-                loggedIn ?
-                  (
-                    <Popover>
-                      <PopoverTrigger>
-                        <Avatar size="sm" name={profile?.name ?? "default"} src={profile?.picture ?? ""} />
-                      </PopoverTrigger>
-                      <Portal> 
-                        <PopoverContent>
-                          <PopoverArrow />
-                          <PopoverHeader>Howdy 👋</PopoverHeader>
-                          <PopoverCloseButton />
-                          <PopoverBody>
-                            <Button colorScheme="red" onClick={handleLogout}>Logout</Button>
-                          </PopoverBody>
-                          <PopoverFooter> Date {new Date().getFullYear()}</PopoverFooter>
-                        </PopoverContent>
-                      </Portal>
-                    </Popover>
-                  ) :
-                  <Button onClick={handleLogin}>Signin</Button>
-                }
-            </WrapItem>
-            <WrapItem>
-                    <Button onClick={toggleColorMode}>
-                        Toggle {colorMode === "light" ? "Dark" : "Light"}
-                    </Button>
-                </WrapItem>
-            </Wrap>
-        </Box>
+        <Header />
         {loggedIn ? <TaskPage  /> :
           (
             <Box textAlign='center' mt={8} mb={8} h='60%' display='flex' alignItems='center' justifyContent='center'>
               {
               loading ?
                 <Spinner size='xl' /> : 
-                <Button onClick={handleLogin}>Signin with Google</Button>
+                <Button onClick={() => setAttemptedLogin(true)}>Signin with Google</Button>
               }
             </Box>
           )

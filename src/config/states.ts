@@ -7,9 +7,19 @@ const loggedInState = atom({
     key: 'loggedInState',
     default: false,
 });
+
+const attemptLoginState = atom({
+    key: 'attemptLoginState',
+    default: false,
+});
+
+const attemptLogoutState = atom({
+    key: 'attemptLogoutState',
+    default: false,
+});
     
 const userProfileState = atom<UserProfile | null>({
-    key: 'userState',
+    key: 'userProfileState',
     default: null,
 });
 
@@ -48,7 +58,24 @@ const loggedInSelector = selector({
     },
 });
 
-const userSelector = selector({
+
+const attemptLoginSelector = selector({
+    key: 'attemptLoginSelector',
+    get: ({ get }) => {
+        const attemptLogin = get(attemptLoginState);
+        return attemptLogin;
+    },
+});
+
+const attemptLogoutSelector = selector({
+    key: 'attemptLogoutSelector',
+    get: ({ get }) => {
+        const attemptLogout = get(attemptLogoutState);
+        return attemptLogout;
+    },
+});
+
+const userProfileSelector = selector({
     key: 'userSelector',
     get: ({ get }) => {
         const loggedIn = get(loggedInState);
@@ -106,7 +133,7 @@ export {
     loggedInState,
     userProfileState,
     loggedInSelector,
-    userSelector,
+    userProfileSelector,
     accessTokenState,
     accessTokenSelector,
     taskObjectState,
@@ -117,5 +144,8 @@ export {
     activeCategoryTasksSelector,
     taskCategoriesListState,
     taskCategoriesListSelector,
-
+    attemptLoginState,
+    attemptLoginSelector,
+    attemptLogoutState,
+    attemptLogoutSelector,
 };
