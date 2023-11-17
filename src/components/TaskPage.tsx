@@ -97,7 +97,9 @@ export default function TaskPage({access_token}: {access_token?: string}) {
             ))}
         </TabList>
         {
-          loading ? <Spinner size='xl' /> : (
+          loading ? <Box p={4} h='90%' d='flex' justifyContent='center' alignItems='center'>
+            <Spinner size='xl' /> 
+          </Box> : (
           <Box p={4} h='90%'>
             <TabPanels>
               {activeCategoryTasks.map((task, key) => (
