@@ -3,6 +3,7 @@ import { activeCategoryTasksState, activeTaskCategorySelector, taskCategoriesLis
 import { DeleteIcon } from "@chakra-ui/icons"
 import { Box, Checkbox } from "@chakra-ui/react"
 import { task, taskCategory } from "../../types/taskapi"
+import TaskItem from "./TaskItem"
 
 export default function TaskList() {
     const Taskobject = useRecoilValue(taskObjectState) 
@@ -26,11 +27,7 @@ export default function TaskList() {
 
     return (
         <div>
-            {activeCategoryTasks.map((task, key) => (
-                  <Box p="2" key={key}>
-                    <Checkbox isChecked={task.completed} onChange={() => handleTaskCheck(task)}>{task.name} <DeleteIcon /></Checkbox>
-                  </Box>
-              ))}
+          {activeCategoryTasks.map((task, key) => <TaskItem key={key} task={task}  />)}
         </div>
     )
 }

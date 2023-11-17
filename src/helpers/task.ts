@@ -279,6 +279,17 @@ export class Task {
         return response.data;
     }
 
+    async deleteTask(task: task, categoryID: string) {
+        const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks/${task.id}`
+        const response = await axios.delete(url, {
+            headers: {
+                Authorization: `Bearer ${this.accessToken}`,
+            },
+        });
+        // console.log(response.data, "add task");
+        return response.data;
+    }
+
     async clearPositionCache(position: number) {
         console.log("clearing cache", position);
         this.tasksCategoryList.clearCache(position);

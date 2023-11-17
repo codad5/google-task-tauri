@@ -23,13 +23,16 @@ npm run launch:dev
 ## TODO
 - [x] Login Page
 - [x] Task Page
-- [x] Add Task
+- [ ] Add Task
+    - [x] Add Task With title
     - [ ] Add Task Description
     - [ ] Add Task Due Date/ Time
     - [ ] Add Sub Task
     - [ ] Ability to star/ unstar task
-- [ ] Delete Task
-- [x] Update Task
+- [x] Delete Task
+- [ ] Update Task
+    - [x] mark task Completed 
+    - [ ] Update Task Info
 - [ ] Add Task Category
 - [ ] Delete Task Category
 - [ ] Update Task Category
