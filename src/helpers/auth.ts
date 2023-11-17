@@ -55,8 +55,9 @@ export async function refreshAccessToken(refreshToken: string) : Promise<AccessT
             client_secret: CLIENT_SECRET,
             grant_type: "refresh_token",
         };
+        console.log('attempting to refresh access token', data);
         const response = await axios.post("https://oauth2.googleapis.com/token", data);
-        return response.data;
+        return {...response.data, refresh_token: refreshToken};
     } catch (error) {
         console.error("Error refreshing access token:", error);
         throw new Error("Error refreshing access token");
@@ -142,7 +143,8 @@ export async function getAuthCode() {
 
 export async function saveAccessToken(accessToken: string|AccessToken) {
     try {
-        const accessTokenText: string = typeof accessToken === "string" ? accessToken : JSON.stringify(accessToken);
+        const accessTokenText: string = typeof accessToken === "string" ? accessToken : JSON.stringify(accessToken, null, 2);
+        console.log(JSON.parse(accessTokenText), "accessTokenText that was saved");
         localStorage.setItem("lastLogin", Date.now() + "");
         return await writeTextFile(STORAGE_PATHS.access_token, accessTokenText, { dir: DEFAULT_DIRECTORY }) 
     } catch (error) {

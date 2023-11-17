@@ -4,6 +4,7 @@ import { CheckIcon } from "@chakra-ui/icons";
 import { taskCategory, task } from "../types/taskapi";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { accessTokenSelector, taskObjectSelector, taskObjectState } from "../config/states";
+import { Task } from "../helpers/task";
 
 
 
@@ -13,7 +14,7 @@ export default function TaskPage() {
 
   if (!access_token) return <div>Not logged in</div>
   
-  
+
   const [taskCategoryList, setTaskCategoryList] = useState<taskCategory[]>([])
   const [activeTaskCategory, setActiveTaskCategory] = useState<number>(-1)
   const TitleinputRef = useRef<HTMLInputElement>(null)
@@ -22,6 +23,15 @@ export default function TaskPage() {
   const [loading, setloading] = useState(true)
   
   useEffect(() => {
+    console.log('before task object', Taskobject, access_token)
+    setTaskobject(new Task(access_token))
+    
+
+  }, [])
+  
+
+  useEffect(() => {
+    console.log('after task object', Taskobject)
     Taskobject.getTaskCategories().then((data) => {
       setTaskCategoryList(data)
       if (data.length > 0) setActiveTaskCategory(0)
@@ -32,8 +42,7 @@ export default function TaskPage() {
         setloading(false)
       })
     })
-
-  }, []) 
+  }, [Taskobject])
 
   useEffect(() => {
     setloading(true)

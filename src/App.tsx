@@ -93,7 +93,7 @@ function App() {
 
   async function handleLoadFrom(accessTokenBody: AccessToken) {
     try {
-      saveAccessToken(JSON.stringify(accessTokenBody)).then(() => {
+      saveAccessToken(JSON.stringify(accessTokenBody, null, 2)).then(() => {
         console.log("access token saved");
       });
       setAccessToken(accessTokenBody.access_token);

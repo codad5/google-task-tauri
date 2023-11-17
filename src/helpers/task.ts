@@ -3,11 +3,126 @@ import axios from "axios";
 import { task, taskCategory } from "../types/taskapi";
 import { BaseDirectory } from "@tauri-apps/api/fs";
 const DEFAULT_DIRECTORY = BaseDirectory.AppLocalData
-class Task {
+
+
+
+class Cache  <T = any> {
+    private cache : { [key: string]: T } = {};
+    private lastUpdate: { [key: string]: Date } = {};
+
+    constructor() {
+        this.cache = {};
+        this.lastUpdate = {};
+    }
+
+    get(key: string) {
+        return this.cache[key];
+    }
+
+    set(key: string, value: any) {
+        this.cache[key] = value;
+        this.lastUpdate[key] = new Date();
+    }
+
+    getCache(key: string) {
+        return this.cache[key];
+    }
+
+    getLastUpdate(key: string) {
+        return this.lastUpdate[key];
+    }
+
+    clearCache(key: string) {
+        this.lastUpdate[key] = new Date(0);
+    }
+
+}
+
+const Cacher = new Cache();
+
+class CacheManager <T = any> {
+    private key: string = "default";
+
+    constructor(key?: string) {
+        if (key) this.key = key;
+        Cacher.set(this.key, null);
+    }
+
+    get() : T {
+        return Cacher.get(this.key);
+    }
+
+    set(value: T) {
+        Cacher.set(this.key, value);
+    }
+
+    update(value: T) {
+        this.set(value);
+    }
+
+    lastUpdate() {
+        return Cacher.getLastUpdate(this.key);
+    }
+
+    clearCache() {
+        Cacher.clearCache(this.key);
+    }
+}
+
+class taskCategoryCacheManager extends CacheManager<taskCategory[]> {
+    private tasklastUpdate: CacheManager<{ [key: string]: Date }> = new CacheManager<{ [key: string]: Date }>("tasklastUpdate");
+    constructor() {
+        super("taskCategoryList");
+    }
+
+    get() : taskCategory[] {
+        return super.get() || [];
+    }
+
+    set(value: taskCategory[]) {
+        super.set(value);
+    }
+
+    update(value: taskCategory[]) {
+        super.update(value);
+    }
+
+    setTaskLastUpdate(positionOrCategoryID: number|string, date: Date) {
+        const tasklastUpdate = this.tasklastUpdate.get();
+        tasklastUpdate[positionOrCategoryID] = date;
+        this.tasklastUpdate.update(tasklastUpdate);
+    }
+
+    getTaskLastUpdate(positionOrCategoryID: number|string) {
+        return this.tasklastUpdate.get()?.[positionOrCategoryID] ?? null;
+    }
+
+    lastUpdate() {
+        return super.lastUpdate();
+    }
+
+    clearCache(positionOrCategoryID?: number | string) {
+        if (positionOrCategoryID) {
+            const tasklastUpdate = this.tasklastUpdate.get();
+            delete tasklastUpdate[positionOrCategoryID];
+            this.tasklastUpdate.update(tasklastUpdate);
+        } else {
+            super.clearCache();
+            this.tasklastUpdate.clearCache();
+        }
+    }
+}
+
+const cacheManager = new taskCategoryCacheManager();
+
+
+
+
+export class Task {
     accessToken ?: string;
     baseUrl = "https://tasks.googleapis.com/tasks/v1";
-    private tasksCategoryList: taskCategory[] = [];
-    lastUpdate: { [key: number|string]: Date } = {};
+    private tasksCategoryList: taskCategoryCacheManager = cacheManager;
+    // lastUpdate: { [key: number|string]: Date } = {};
 
     constructor(accessToken ?: string) {
         this.accessToken = accessToken;
@@ -17,7 +132,7 @@ class Task {
     }
 
     get getTasksCategoryList() {
-        return this.tasksCategoryList;
+        return this.tasksCategoryList.get();
     }
 
     async getTaskCategories() {
@@ -32,18 +147,18 @@ class Task {
                 tasks = await this.getTasksFromFile();
             }
             if (tasks) {
-                this.tasksCategoryList = tasks.map((taskCategory) => {
+                this.tasksCategoryList.set(tasks.map((taskCategory) => {
                     // if category with same id exists, merge them
-                    const existingCategory = this.tasksCategoryList.find((category) => category.id === taskCategory.id);
+                    const existingCategory = this.tasksCategoryList.get()?.find((category) => category.id === taskCategory.id);
                     if (existingCategory) {
-                        taskCategory.tasks = [...existingCategory.tasks!, ...taskCategory.tasks!];
+                        taskCategory.tasks = [...existingCategory.tasks || [], ...taskCategory.tasks || []];
                     }
                     return taskCategory;
-                });
+                }))
             }
             return tasks;
         } catch (error) {
-            // console.error(error);
+            console.error(error);
             return [];
         }
     }
@@ -80,7 +195,9 @@ class Task {
             let tasks = null;
             let readfromfile = false;
             // if the lastTaskCategoryByPosition is less than 2 minutes, return the tasks
-            if (this.lastUpdate[position] && (new Date().getTime() - this.lastUpdate[position].getTime()) < (45 * 1000)) {
+            let cacheLastUpdate = this.tasksCategoryList.getTaskLastUpdate(position);
+            if (cacheLastUpdate && (new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000)) {
+            // if (this.lastUpdate[position] && (new Date().getTime() - this.lastUpdate[position].getTime()) < (45 * 1000)) {
                 tasks = await this.getTasksByCategoryPositionFromFile(position);
                 readfromfile = true;
             }
@@ -90,17 +207,21 @@ class Task {
                 tasks = await this.getTasksByCategoryPositionFromFile(position);
                 readfromfile = true;
             }
-            this.tasksCategoryList[position] = { ...this.tasksCategoryList[position], tasks };
+            // this.tasksCategoryList[position] = { ...this.tasksCategoryList[position], tasks };
+            let newTask = this.tasksCategoryList.get();
+            newTask[position] = { ...newTask[position], tasks };
+            this.tasksCategoryList.update(newTask);
             console.log(this.tasksCategoryList, "this.tasks", "after if");
             if(!readfromfile) await this.saveTasksToFile();
             return tasks;
         } catch (error) {
+            console.error("Error getting tasks by category position:", error);
             return [];
         }
     }
 
     async getTasksByCategoryPositionFromApi(position: number): Promise<task[]> {
-        const taskCategory = this.tasksCategoryList[position]
+        const taskCategory = this.tasksCategoryList.get()[position];
         if (!taskCategory) return [];
         const url = `${this.baseUrl}/lists/${taskCategory.id}/tasks`;
         const response = await axios.get(url, {
@@ -117,7 +238,7 @@ class Task {
                 completed: item.status === "completed",
             };
         });
-        this.lastUpdate[position] = new Date();
+        this.tasksCategoryList.setTaskLastUpdate(position, new Date());
         return tasks;
     }
 
@@ -133,7 +254,8 @@ class Task {
             let readfromfile = false;
             
             // if the lastTaskCategoryByPosition is less than 2 minutes, return the tasks
-            if (this.lastUpdate[categoryID] && (new Date().getTime() - this.lastUpdate[categoryID].getTime()) < 45 * 1000) {
+            let cacheLastUpdate = this.tasksCategoryList.getTaskLastUpdate(categoryID);
+            if (cacheLastUpdate && (new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000)) { 
                 task = await this.getTaskByIdFromFile(categoryID);
                 readfromfile = true;
                 // console.log("from file", task);
@@ -145,13 +267,13 @@ class Task {
                 task = await this.getTaskByIdFromFile(categoryID);
                 readfromfile = true;
             }
-            let newTask = this.tasksCategoryList.map((taskCategory) => {
+            let newTask = this.tasksCategoryList.get().map((taskCategory) => {
                 if (taskCategory.id === categoryID) {
                     taskCategory.tasks = task;
                 }
                 return taskCategory;
             });
-            this.tasksCategoryList = newTask;
+            this.tasksCategoryList.update(newTask);
             if(!readfromfile) await this.saveTasksToFile();
             return task;
         } catch (error) {
@@ -176,7 +298,7 @@ class Task {
                 completed: item.status !== "needsAction",
             };
         });
-        this.lastUpdate[categoryID] = new Date();
+        this.tasksCategoryList.setTaskLastUpdate(categoryID, new Date());
         return tasks;
     }
 
@@ -216,14 +338,8 @@ class Task {
         return response.data;
     }
 
-    async clearPositionCache(positionOrCategoryID: number|string) {
-        this.lastUpdate[positionOrCategoryID] = new Date(0);
+    async clearPositionCache(position: number) {
+        this.tasksCategoryList.clearCache();
         return this
     }
 }
-
-
-
-const taskObject = new Task();
-
-export { taskObject, Task };

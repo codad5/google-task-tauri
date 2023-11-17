@@ -1,6 +1,6 @@
 import { atom, selector } from 'recoil';
 import { UserProfile } from '../types/googleapis';
-import { Task, taskObject } from '../helpers/task';
+import { Task } from '../helpers/task';
 
 const loggedInState = atom({
     key: 'loggedInState',
@@ -19,7 +19,7 @@ const accessTokenState = atom<string | null>({
 
 const taskObjectState = atom<Task>({
     key: 'taskObjectState',
-    default:  taskObject
+    default:  new Task(),
 });
 
 
