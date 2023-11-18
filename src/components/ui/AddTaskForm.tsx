@@ -1,6 +1,6 @@
 
 import { CheckIcon, SmallAddIcon } from "@chakra-ui/icons";
-import { Wrap, WrapItem, Input, IconButton, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, useDisclosure, Box, Stack, FormLabel, Textarea } from "@chakra-ui/react";
+import { Input, IconButton, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, useDisclosure, Box, Stack, FormLabel, Textarea } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { taskObjectState, taskCategoriesListSelector, activeTaskCategorySelector, activeCategoryTasksState } from "../../config/states";
@@ -23,9 +23,8 @@ const AddTaskForm = () => {
             console.log('registering shortcut')
             register('CommandOrControl+Shift+N', () => {
                 console.log('Shortcut triggered');
-                if (!TitleinputRef.current) return;
                 onOpen()
-                TitleinputRef.current.focus()
+                TitleinputRef.current?.focus()
             }).then(() => {
                 console.log('Shortcut registered');
             }).catch((err) => {
