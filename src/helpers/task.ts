@@ -1,9 +1,10 @@
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 import axios from "axios";
 import { task, taskCategory } from "../types/taskapi";
-import { BaseDirectory } from "@tauri-apps/api/fs";
 import { GlobalCacheManager } from "./cacher";
-const DEFAULT_DIRECTORY = BaseDirectory.AppLocalData
+import settings from "../config/settings";
+const DEFAULT_DIRECTORY = settings.fs.DEFAULT_DIRECTORY;
+const TASKS_FILE = settings.storage.paths.tasks;
 
 
 
@@ -122,11 +123,11 @@ export class Task {
     async saveTasksToFile(taskCategories?: taskCategory[]) {
         const tobeSaved = taskCategories || this.tasksCategoryList.get();
         const tasks = JSON.stringify(tobeSaved);
-        await writeTextFile("tasks.json", tasks, { dir: DEFAULT_DIRECTORY });
+        await writeTextFile(TASKS_FILE, tasks, { dir: DEFAULT_DIRECTORY });
     }
 
     async getTasksFromFile(): Promise<taskCategory[]> {
-        const tasks = await readTextFile("tasks.json", { dir: DEFAULT_DIRECTORY });
+        const tasks = await readTextFile(TASKS_FILE, { dir: DEFAULT_DIRECTORY });
         return JSON.parse(tasks);
     }
 
