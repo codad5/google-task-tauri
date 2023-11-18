@@ -3,7 +3,7 @@ import { Box, Checkbox, Flex, IconButton } from "@chakra-ui/react";
 import { task, taskCategory } from "../../types/taskapi";
 import { useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { taskObjectState, taskCategoriesListSelector, activeTaskCategorySelector, activeCategoryTasksState } from "../../config/states";
+import { taskObjectState, taskCategoriesListSelector, activeTaskCategorySelector, activeCategoryTasksState, messageState } from "../../config/states";
 
 
 export default function TaskItem({ task, key }: { task: task, key: number }) {
@@ -12,10 +12,12 @@ export default function TaskItem({ task, key }: { task: task, key: number }) {
     const taskCategoryList: taskCategory[] = useRecoilValue<taskCategory[]>(taskCategoriesListSelector)
     const activeTaskCategory = useRecoilValue<number>(activeTaskCategorySelector)
     const setActiveCategoryTasks = useSetRecoilState(activeCategoryTasksState)
+    const setToastMessage = useSetRecoilState(messageState)
 
 
     const handleTaskCheck = (task: task) => {
         Taskobject.markTask({ ...task, completed: !task.completed }, taskCategoryList[activeTaskCategory].id).then(() => {
+            setToastMessage({title: !task.completed == true ? 'Task completed' : "Task Unchecked", type: !task.completed == true ? 'success' : 'info'});
             Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
                 setActiveCategoryTasks(active => {
                     return active.map((t) => {

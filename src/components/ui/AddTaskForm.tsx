@@ -1,6 +1,6 @@
 
-import { CheckIcon } from "@chakra-ui/icons";
-import { Wrap, WrapItem, Input, IconButton } from "@chakra-ui/react";
+import { CheckIcon, SmallAddIcon } from "@chakra-ui/icons";
+import { Wrap, WrapItem, Input, IconButton, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, useDisclosure, Box, Stack, FormLabel, Textarea } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { taskObjectState, taskCategoriesListSelector, activeTaskCategorySelector, activeCategoryTasksState } from "../../config/states";
@@ -9,7 +9,8 @@ import { isRegistered, register } from "@tauri-apps/api/globalShortcut";
 
 const AddTaskForm = () => {
     const TitleinputRef = useRef<HTMLInputElement>(null)
-    const DescriptionInputRef = useRef<HTMLInputElement>(null)
+    const DescriptionInputRef = useRef<HTMLTextAreaElement>(null)
+    const { isOpen, onOpen, onClose } = useDisclosure()
     const Taskobject = useRecoilValue(taskObjectState) 
     const taskCategoryList = useRecoilValue<taskCategory[]>(taskCategoriesListSelector)
     const activeTaskCategory = useRecoilValue<number>(activeTaskCategorySelector)
@@ -23,6 +24,7 @@ const AddTaskForm = () => {
             register('CommandOrControl+Shift+N', () => {
                 console.log('Shortcut triggered');
                 if (!TitleinputRef.current) return;
+                onOpen()
                 TitleinputRef.current.focus()
             }).then(() => {
                 console.log('Shortcut registered');
@@ -69,39 +71,51 @@ const AddTaskForm = () => {
         if (DescriptionInputRef.current) DescriptionInputRef.current.value = ''
     }
     return (
-        <form onSubmit={handleAddTask}>
-            <Wrap p="2" spacing="30px">
-                      <WrapItem>         
-                          <Input
-                              w='auto'
-                              display='inline-flex'
-                              ref={TitleinputRef}
-                              placeholder="Title"
-                              />
-                    </WrapItem>
-                    {/* the description
-                    <WrapItem>
-                      <Input
-                        w='auto'
-                        display='inline-flex'
-                        ref={DescriptionInputRef}
-                        placeholder="Description"
-                      />
-                    </WrapItem> */}
-                      {/* the due date */}
-                      <WrapItem>           
-                          <IconButton
-                          isRound={true}
-                          variant="solid"
-                          colorScheme="teal"
-                          aria-label="Done"
-                          fontSize="20px"
-                          icon={<CheckIcon />}
-                          type='submit'
-                          />
-                      </WrapItem>
-                  </Wrap>
-        </form>
+        <>
+            <Drawer placement={'bottom'} onClose={onClose} isOpen={isOpen}>
+                <DrawerOverlay />
+                <DrawerContent>
+                <DrawerHeader borderBottomWidth='1px'>Add New Task</DrawerHeader>
+                <DrawerBody>
+                    <form onSubmit={handleAddTask}>
+                        <Stack  p="2" spacing="30px">
+                            <FormLabel htmlFor='title'>Name</FormLabel>
+                            <Box>         
+                                <Input
+                                    w='auto'
+                                    id="title"
+                                    display='inline-flex'
+                                    ref={TitleinputRef}
+                                    placeholder="Title"
+                                    />
+                            </Box>
+                            <Box>
+                                <Textarea 
+                                w='auto'
+                                display='inline-flex'
+                                ref={DescriptionInputRef}
+                                placeholder="Description"
+                                />
+                            </Box>
+                            {/* the due date */}
+                            <Box>           
+                                <IconButton
+                                isRound={true}
+                                variant="solid"
+                                colorScheme="teal"
+                                aria-label="Done"
+                                fontSize="20px"
+                                icon={<CheckIcon />}
+                                type='submit'
+                                />
+                            </Box>
+                        </Stack>
+                    </form>
+                </DrawerBody>
+            </DrawerContent>
+            </Drawer>
+            <IconButton icon={<SmallAddIcon />}  onClick={onOpen} aria-label={""} bg={'teal'} position={'fixed'} bottom={'20px'} right={'20px'} />
+        </>
     );
 };
 

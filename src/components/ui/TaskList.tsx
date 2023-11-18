@@ -22,7 +22,7 @@ export default function TaskList() {
         </AccordionButton>
         <AccordionPanel pb={4}>
           <Box>
-            {unCompletedTasks.length > 0 ? unCompletedTasks.map((task, key) => <TaskItem key={key} task={task} />) : <Center>Congrate you completed all your task</Center>}
+            {unCompletedTasks.length > 0 ? unCompletedTasks.map((task, key) => <TaskItem key={key} task={task} />) : <Center h="40vh">Congrate you completed all your task</Center>}
           </Box>
         </AccordionPanel>
       </AccordionItem>

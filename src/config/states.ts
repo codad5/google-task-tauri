@@ -48,7 +48,7 @@ const taskCategoriesListState = atom<taskCategory[]>({
     default: [],
 });
 
-const messageState = atom<{ title: string, body: string , type: "info" | "warning" | "success" | "error" | "loading" } | null>({
+const messageState = atom<{ title: string, body?: string , type: "info" | "warning" | "success" | "error" | "loading" } | null>({
     key: 'messageState',
     default: null,
 });
