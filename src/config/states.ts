@@ -48,6 +48,12 @@ const taskCategoriesListState = atom<taskCategory[]>({
     default: [],
 });
 
+const messageState = atom<{ title: string, body: string , type: "info" | "warning" | "success" | "error" | "loading" } | null>({
+    key: 'messageState',
+    default: null,
+});
+    
+
 
 
 const loggedInSelector = selector({
@@ -128,6 +134,14 @@ const taskCategoriesListSelector = selector({
     },
 });
 
+const messageSelector = selector({
+    key: 'messageSelector',
+    get: ({ get }) => {
+        const message = get(messageState);
+        return message;
+    },
+});
+
 
 export {
     loggedInState,
@@ -148,4 +162,6 @@ export {
     attemptLoginSelector,
     attemptLogoutState,
     attemptLogoutSelector,
+    messageState,
+    messageSelector,
 };

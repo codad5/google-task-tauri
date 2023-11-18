@@ -6,8 +6,9 @@ import { AccessToken, UserProfile } from "./types/googleapis";
 import { disableMenu, pushNotification } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { accessTokenState, attemptLoginState, attemptLogoutState, loggedInState, userProfileState } from "./config/states";
+import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, attemptLoginState, attemptLogoutState, loggedInState, messageState, userProfileState } from "./config/states";
 import Header from "./components/ui/Header";
+import { task } from "./types/taskapi";
 
 // disable default context menu on build
 disableMenu();
@@ -26,8 +27,29 @@ function App() {
   const setAccessToken = useSetRecoilState<string | null>(accessTokenState);
   const [attemptedLogin, setAttemptedLogin] = useRecoilState<boolean>(attemptLoginState);
   const [attemptedLogout, setAttemptedLogout] = useRecoilState<boolean>(attemptLogoutState);
+  const setActiveTaskCategory = useSetRecoilState<number>(activeTaskCategoryState);
+  const setActiveCategoryTasksState = useSetRecoilState<task[]>(activeCategoryTasksState);
+  const [toastMessage, setToastMessage] = useRecoilState(messageState)
+
   // error message toast
   const toast = useToast()
+
+
+  useEffect(() => {
+    if (toastMessage) {
+      toast({
+        title: toastMessage.title,
+        description: toastMessage.body,
+        status: toastMessage.type,
+        duration: 9000,
+        isClosable: true,
+      })
+      setTimeout(() => {
+        setToastMessage(null)
+      }, 5000)
+    }
+  }, [toastMessage])
+
 
   
 
@@ -51,16 +73,15 @@ function App() {
       } catch (err) {
         console.log("error", err);
         setLoading(false)
-        toast({
+        setToastMessage({
           title: "Error",
-          description: "Error signing in",
-          status: "error",
-          duration: 9000,
-          isClosable: true,
+          body: "Error signing in",
+          type: "error"
         })
       }
     });
   }, []);
+  
 
   // check the offline data for access token
   useEffect(() => {
@@ -111,12 +132,10 @@ function App() {
       console.log(err);
       setLoading(false)
       await handleLogout();
-      toast({
+      setToastMessage({
         title: "Error",
-        description: "Error signing in",
-        status: "error",
-        duration: 9000,
-        isClosable: true,
+        body: "Error signing in",
+        type: "error"
       })
     }
   }
@@ -127,6 +146,8 @@ function App() {
     setAccessToken(null);
     setProfile(null);
     setLoggedIn(false);
+    setActiveTaskCategory(-1)
+    setActiveCategoryTasksState([])
     await deleteAccessToken();
     setLoading(false)
   }
@@ -161,12 +182,10 @@ function App() {
     } catch (error) {
       console.log(error);
       setLoading(false)
-      toast({
+      setToastMessage({
         title: "Error",
-        description: "Error signing in",
-        status: "error",
-        duration: 9000,
-        isClosable: true,
+        body: "Error signing in",
+        type: "error"
       })
     }
   }

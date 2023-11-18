@@ -2,7 +2,7 @@ import { useState , useEffect} from "react";
 import { Tabs, TabPanels, Box, Spinner} from '@chakra-ui/react'
 import { taskCategory, task } from "../types/taskapi";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { accessTokenSelector, activeCategoryTasksState, activeTaskCategoryState, taskObjectState, taskCategoriesListState } from "../config/states";
+import { accessTokenSelector, activeCategoryTasksState, activeTaskCategoryState, taskObjectState, taskCategoriesListState, messageState } from "../config/states";
 import { Task } from "../helpers/task";
 import TaskList from "./ui/TaskList";
 import AddTaskForm from "./ui/AddTaskForm";
@@ -21,12 +21,17 @@ export default function TaskPage() {
   const [activeTaskCategory, setActiveTaskCategory] = useRecoilState<number>(activeTaskCategoryState)
   const setActiveCategoryTasks = useSetRecoilState<task[]>(activeCategoryTasksState)
   const [loading, setloading] = useState(true)
+  const [toastMessage, setToastMessage] = useRecoilState(messageState)
   
   useEffect(() => {
     console.log('before task object', Taskobject, access_token)
-    setTaskobject(new Task(access_token))
-    
-
+    const newtaskObject = new Task(access_token)
+    newtaskObject.setErrorHandler((err) => {
+      console.log('error', err)
+      if (toastMessage) return;
+      setToastMessage({title: 'Error', body: err.message, type: 'error'})
+    })
+    setTaskobject(newtaskObject)
   }, [])
   
 

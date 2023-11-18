@@ -9,9 +9,10 @@ import { taskObjectState, taskCategoriesListSelector, activeTaskCategorySelector
 export default function TaskItem({ task, key }: { task: task, key: number }) {
     const [isHovered, setIsHovered] = useState(false);
     const Taskobject = useRecoilValue(taskObjectState) 
-    const taskCategoryList = useRecoilValue<taskCategory[]>(taskCategoriesListSelector)
+    const taskCategoryList: taskCategory[] = useRecoilValue<taskCategory[]>(taskCategoriesListSelector)
     const activeTaskCategory = useRecoilValue<number>(activeTaskCategorySelector)
     const setActiveCategoryTasks = useSetRecoilState(activeCategoryTasksState)
+
 
     const handleTaskCheck = (task: task) => {
         Taskobject.markTask({ ...task, completed: !task.completed }, taskCategoryList[activeTaskCategory].id).then(() => {

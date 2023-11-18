@@ -10,36 +10,89 @@ const TASKS_FILE = settings.storage.paths.tasks;
 
 
 
+/**
+ * This is a class that helps to manage the cache of the task categories
+ */
 class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
+    /**
+     * This is a object that stores the last update of the tasks by position or category id
+     */
     private tasklastUpdate: GlobalCacheManager<{ [key: string]: Date }> = new GlobalCacheManager<{ [key: string]: Date }>("tasklastUpdate");
     constructor() {
         super("taskCategoryList");
     }
 
+    /**
+     * This is a getter for the taskCategoryList
+     * @returns taskCategory[]
+     * @memberof taskCategoryCacheManager
+     * @override
+     */
     get() : taskCategory[] {
         return super.get() || [];
     }
 
+    /**
+     * This is a setter for the taskCategoryList
+     * @param {taskCategory[]} value
+     * @memberof taskCategoryCacheManager
+     * @override
+     */
     set(value: taskCategory[]) {
         super.set(value);
     }
 
+    /**
+     * This is a updater for the taskCategoryList
+     * @param {taskCategory[]} value
+     * @memberof taskCategoryCacheManager
+     * @override
+     */
+
     update(value: taskCategory[]) {
         super.update(value);
     }
+
+    /**
+     * This is a setter for the taskCategoryList
+     * @param {taskCategory[]} value
+     * @memberof taskCategoryCacheManager
+     * @override
+     */
 
     setTaskLastUpdate(positionOrCategoryID: number|string, date: Date) {
         const tasklastUpdate = { ...this.tasklastUpdate.get() , [positionOrCategoryID]: date };
         this.tasklastUpdate.update(tasklastUpdate);
     }
 
+    /**
+     * This is a getter for the taskCategoryList
+     * @param {number|string} positionOrCategoryID
+     * @returns Date | null
+     * @memberof taskCategoryCacheManager
+     * @override
+     */
+
     getTaskLastUpdate(positionOrCategoryID: number|string) {
         return this.tasklastUpdate.get()?.[positionOrCategoryID] ?? null;
     }
 
+    /**
+     * This is a getter to get the last update of the taskCategoryList
+     * @returns Date | null
+     * @memberof taskCategoryCacheManager
+     * @override
+     */
     lastUpdate() {
         return super.lastUpdate();
     }
+
+    /**
+     * This is a method to clear the cache of the taskCategoryList
+     * @param {number|string} positionOrCategoryID
+     * @memberof taskCategoryCacheManager
+     * @override
+     */
 
     clearCache(positionOrCategoryID?: number | string) {
         if (positionOrCategoryID !== undefined) {
@@ -54,23 +107,80 @@ class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
     }
 }
 
+/**
+ * This is a instance of the taskCategoryCacheManager
+ * @type {taskCategoryCacheManager}
+ */
 const cacheManager = new taskCategoryCacheManager();
 
 
 
-
+/**
+ * This is a class that helps to manage the tasks
+ * @export
+ * @class Task
+ */
 export class Task {
-    accessToken ?: string;
-    baseUrl = "https://tasks.googleapis.com/tasks/v1";
+    /**
+     * This is the access token of the user
+     * @type {string}
+     * @memberof Task
+     * @private
+     * @readonly
+     * @default null
+     * @todo make this private
+     */
+    accessToken?: string;
+    /**
+     * This is the base url of the api
+     * @type {string}
+     * @memberof Task
+     * @private
+     * @readonly
+     * @default "https://tasks.googleapis.com/tasks/v1"
+     * @todo make this private
+     */
+    baseUrl: string = "https://tasks.googleapis.com/tasks/v1";
+    /**
+     * This is a object that stores the last update of the tasks by position or category id
+     * @type {taskCategoryCacheManager}
+     * @memberof Task
+     * @private
+     * @readonly
+     * @todo make this private
+     */
     private tasksCategoryList: taskCategoryCacheManager = cacheManager;
+
+    private errorHandler: (error: Error) => void = () => {};
     // lastUpdate: { [key: number|string]: Date } = {};
 
     constructor(accessToken ?: string) {
         this.accessToken = accessToken;
     }
+
+
+    /**
+     * This is a setter for the error handler
+     * @param {(error: Error) => void} errorHandler
+     */
+
+    setErrorHandler(errorHandler: (error: Error) => void) {
+        this.errorHandler = errorHandler;
+    }
+
+    /**
+     * This is a setter for the access token
+     * @param {string} accessToken
+     */
+
     setAccessToken(accessToken: string) {
         this.accessToken = accessToken;
     }
+
+    /**
+     * This is a to get the task categories
+     * @returns {taskCategory[]}
+     */
 
     get getTasksCategoryList() {
         return this.tasksCategoryList.get();
@@ -99,13 +209,15 @@ export class Task {
             }
             return tasks;
         } catch (error) {
-            console.error(error);
+            console.error("Error getting tasks:", error);
+            this.errorHandler(error as Error);
             return [];
         }
     }
 
     async getTasksFromApi(accessToken: string) : Promise<taskCategory[]> {
         const url = `${this.baseUrl}/users/@me/lists`;
+        if(!navigator.onLine) throw new Error("No internet connection");
         const response = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -157,13 +269,15 @@ export class Task {
             return tasks;
         } catch (error) {
             console.error("Error getting tasks by category position:", error);
+            this.errorHandler(error as Error);
             return [];
         }
     }
 
     async getTasksByCategoryPositionFromApi(position: number): Promise<task[]> {
+        if(!navigator.onLine) throw new Error("No internet connection");
         const taskCategory = this.tasksCategoryList.get()[position];
-        if (!taskCategory) return [];
+        if (!taskCategory) throw new Error("Task category not found");
         const url = `${this.baseUrl}/lists/${taskCategory.id}/tasks`;
         const response = await axios.get(url, {
             headers: {
@@ -220,11 +334,13 @@ export class Task {
             return task;
         } catch (error) {
             // console.error(error);
+            this.errorHandler(error as Error);
             return null;
         }
     }
 
     async getTaskByIdFromApi(categoryID: string): Promise<task[]> {
+        if(!navigator.onLine) throw new Error("No internet connection");
         const url = `${this.baseUrl}/lists/${categoryID}/tasks`;
         const response = await axios.get(url, {
             headers: {
@@ -252,43 +368,64 @@ export class Task {
 
     async markTask(task: task, categoryID : string){
         // console.log(task.completed, "mark task");
-        const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks/${task.id}`
-        const response = await axios.put(url, {
-            id: task.id,
-            title: task.name,
-            status: task.completed ? "completed" : "needsAction",
-        }, {
-            headers: {
-                Authorization: `Bearer ${this.accessToken}`,
-            },
-        });
-        // console.log(response.data, "mark task");
-        return response.data;
+        try {
+            if(!navigator.onLine) throw new Error("No internet connection");
+            const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks/${task.id}`
+            const response = await axios.put(url, {
+                id: task.id,
+                title: task.name,
+                status: task.completed ? "completed" : "needsAction",
+            }, {
+                headers: {
+                    Authorization: `Bearer ${this.accessToken}`,
+                },
+            });
+            // console.log(response.data, "mark task");
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            this.errorHandler(error as Error);
+            return null;
+        }
 
     }
 
     async addToTask(task: task, categoryID: string) {
-        const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks`
-        const response = await axios.post(url, {
-            title: task.name,
-        }, {
-            headers: {
-                Authorization: `Bearer ${this.accessToken}`,
-            },
-        });
-        // console.log(response.data, "add task");
-        return response.data;
+        try {
+            if(!navigator.onLine) throw new Error("No internet connection");
+            const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks`
+            const response = await axios.post(url, {
+                title: task.name,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${this.accessToken}`,
+                },
+            });
+            // console.log(response.data, "add task");
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            this.errorHandler(error as Error);
+            return null;
+        }
     }
 
     async deleteTask(task: task, categoryID: string) {
-        const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks/${task.id}`
-        const response = await axios.delete(url, {
-            headers: {
-                Authorization: `Bearer ${this.accessToken}`,
-            },
-        });
-        // console.log(response.data, "add task");
-        return response.data;
+        try {
+            if (!navigator.onLine) throw new Error("No internet connection");
+            const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks/${task.id}`
+            const response = await axios.delete(url, {
+                headers: {
+                    Authorization: `Bearer ${this.accessToken}`,
+                },
+            });
+            // console.log(response.data, "add task");
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            this.errorHandler(error as Error);
+            return null;
+        }
     }
 
     async clearPositionCache(position: number) {
