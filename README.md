@@ -12,12 +12,9 @@ cd google-task-tauri
 npm install
 npm run launch:dev
 ```
-## LOGIN PAGE
+![Screenshot (382)](https://github.com/codad5/google-task-tauri/assets/66634814/3ad9bedc-314e-4c36-8da3-cfc575f550fe)
 
-![image](https://github.com/codad5/google-task-tauri/assets/66634814/0a9d4e82-7257-437e-a4f9-48c21760d56e)
 
-## TASK PAGE
-![image](https://github.com/codad5/google-task-tauri/assets/66634814/ba237e7f-ff66-4390-9224-2dbe3b58ab0e)
 
 
 ## TODO
