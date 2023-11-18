@@ -136,7 +136,7 @@ export class Task {
             let readfromfile = false;
             // if the lastTaskCategoryByPosition is less than 2 minutes, return the tasks
             let cacheLastUpdate = this.tasksCategoryList.getTaskLastUpdate(position);
-            if (cacheLastUpdate && (new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000)) {
+            if (cacheLastUpdate && ((new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000)) || !navigator.onLine) {
             // if (this.lastUpdate[position] && (new Date().getTime() - this.lastUpdate[position].getTime()) < (45 * 1000)) {
                 tasks = await this.getTasksByCategoryPositionFromFile(position);
                 readfromfile = true;
@@ -196,7 +196,7 @@ export class Task {
             
             // if the lastTaskCategoryByPosition is less than 2 minutes, return the tasks
             let cacheLastUpdate = this.tasksCategoryList.getTaskLastUpdate(categoryID);
-            if (cacheLastUpdate && (new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000)) { 
+            if (cacheLastUpdate && ((new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000) || !navigator.onLine)) { 
                 task = await this.getTaskByIdFromFile(categoryID);
                 readfromfile = true;
                 // console.log("from file", task);
