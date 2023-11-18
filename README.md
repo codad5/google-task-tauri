@@ -4,6 +4,15 @@
 ## DESCRIPTION
 A light weight desktop app for google task built with tauri, react, rust and typescript. 
 
+
+## TECH STACK
+### Tauri + React + Typescript + Chakra-ui
+
+# PREREQUISITE
+- Rust
+- Node
+- Cargo
+
 ## INSTALLATION
 
 ```bash
@@ -12,7 +21,22 @@ cd google-task-tauri
 npm install
 npm run launch:dev
 ```
+#  SETUP
+
+#### Recommended IDE Setup
+
+- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+
+#### Environment Setup
+- Create a `credentials.ts` file in the path `src/config`  and paste the code below
+  ```ts
+  export const CLIENT_ID = "YOUR_CLIENT_ID";
+  export const CLIENT_SECRET = "YOUR_CLIENT_SECRET"
+  ```
+- Go to `src/config/settings.ts` and set up your app config 
+
 ![Screenshot (382)](https://github.com/codad5/google-task-tauri/assets/66634814/3ad9bedc-314e-4c36-8da3-cfc575f550fe)
+
 
 
 
@@ -44,12 +68,3 @@ npm run launch:dev
     - [ ] Add Offline Storage 
     - [ ] Sync Offline Storage with Google Task once internet connection is available
 
-
-## TECH STACK
-### Tauri + React + Typescript + Chakra-ui
-
-This template should help get you started developing with Tauri, React and Typescript in Vite.
-
-#### Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
