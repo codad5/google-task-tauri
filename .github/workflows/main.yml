@@ -55,19 +55,6 @@ jobs:
           fi
           xargs sudo apt install -y < environment/apt_packages.txt
 
-      - name: Create .env file
-        uses: actions/github-script@v6
-        id: create-env
-        with:
-          script: |
-            const content = `
-            VITE_CLIENT_SECRET=${{ secrets.VITE_GOOGLE_CLIENT_ID  }}
-            VITE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
-            `
-            const root = process.cwd();
-            const fs = require('fs')
-            fs.writeFileSync('.env', content, 'utf-8')
-
       - name: Install app dependencies from lockfile and build web
         # NOTE: comment out && yarn build if frontend does not have build script
         run: npm install && npm run build
