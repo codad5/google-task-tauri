@@ -1568,7 +1568,7 @@ dependencies = [
 
 [[package]]
 name = "google-task"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "google-tasks1",
  "oauth2",

@@ -1,6 +1,6 @@
 [package]
 name = "google-task"
-version = "0.0.0"
+version = "0.0.1"
 description = "Google Task by Codad5"
 authors = ["you"]
 license = ""
