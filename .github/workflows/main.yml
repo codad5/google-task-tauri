@@ -48,6 +48,9 @@ jobs:
         run: |
           sudo apt update
           if [ ! -f environment/apt_packages.txt ]; then
+            if [ ! -d environment ]; then
+              mkdir environment
+            fi
             touch environment/apt_packages.txt
           fi
           xargs sudo apt install -y < environment/apt_packages.txt
