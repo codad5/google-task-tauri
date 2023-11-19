@@ -38,10 +38,3 @@ dist-ssr
 *.crt
 *.p12
 *.pfx
-/credentials/*
-/credentials/**/*
-*/credentials/*
-*/credentials/**/*
-**/credentials/*
-*/credentials.*
-credentials.*

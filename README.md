@@ -28,11 +28,15 @@ npm run launch:dev
 - [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
 
 #### Environment Setup
-- Create a `credentials.ts` file in the path `src/config`  and paste the code below
-  ```ts
-  export const CLIENT_ID = "YOUR_CLIENT_ID";
-  export const CLIENT_SECRET = "YOUR_CLIENT_SECRET"
-  ```
+- Create a new project on [Google Cloud Platform](https://console.cloud.google.com/)
+- Enable Google Task API
+- Create a new OAuth 2.0 Client ID
+- Copy the Client ID and Client Secret
+- Go to your `.env` file and set up your environment variables like so
+    ```
+    VITE_GOOGLE_CLIENT_ID = <YOUR_CLIENT_ID>
+    VITE_GOOGLE_CLIENT_SECRET = <YOUR_CLIENT_SECRET>
+    ```
 - Go to `src/config/settings.ts` and set up your app config 
 
 ![Screenshot (382)](https://github.com/codad5/google-task-tauri/assets/66634814/3ad9bedc-314e-4c36-8da3-cfc575f550fe)
