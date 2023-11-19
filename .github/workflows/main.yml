@@ -49,15 +49,8 @@ jobs:
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
         run: |
-          sudo apt update
-          if [ ! -f environment/apt_packages.txt ]; then
-            if [ ! -d environment ]; then
-              mkdir environment
-            fi
-            touch environment/apt_packages.txt
-          fi
-          xargs sudo apt install -y < environment/apt_packages.txt
-          sudo apt install -y libgdk-pixbuf2.0-dev librust-atk-dev
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev
 
       - name: Install app dependencies
         run: npm install
