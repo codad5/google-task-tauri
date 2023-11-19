@@ -89,45 +89,40 @@ function App() {
     // get access token from storage
     getAccessTokenFromStorage().then((accessToken) => {
       // if access token exists
-      if (accessToken) {
-        pushNotification("Login Successful")
-        if (navigator.onLine) {
-          // fetch user profile
-          fetchUserProfile(accessToken.access_token).then((profile) => {
-            if (profile) {
+      try {
+        if (!accessToken) throw new Error("Signin required");
+          pushNotification("Login Successful")
+          if (navigator.onLine) {
+            // fetch user profile
+            fetchUserProfile(accessToken.access_token).then((profile) => {
+              if(!profile) throw new Error("Something went wrong, please try again");
               setProfile(profile);
               setAccessToken(accessToken.access_token);
               setLoggedIn(true);
               setLoading(false)
               pushNotification(`welcome back ${profile.name}`)
-            }
-            else {
-              throw new Error("Something went wrong, please try again");
-            }
-
-          });
-        }
-        else {
-          getUserProfileFromStorage().then((profile) => {
-          if (profile) {
-            setProfile(profile);
-            setAccessToken(accessToken.access_token);
-            setLoggedIn(true);
-            pushNotification(`welcome back ${profile.name}`)
+            });
           }
-          });
+          else {
+            getUserProfileFromStorage().then((profile) => {
+              if (!profile) throw new Error("Signin required");
+                setProfile(profile);
+                setAccessToken(accessToken.access_token);
+                setLoggedIn(true);
+                pushNotification(`welcome back ${profile.name}`)
+            });
+          }
+      }catch (err) {
+          console.log(err);
+          setLoading(false)
+          setToastMessage({
+            title: "Error",
+            body: "Error signing in",
+            type: "error"
+          })
         }
-      } else {
-        throw new Error("Signin required");
-      }
-    }).catch((err) => {
-      console.log(err);
+    }).finally(() => {
       setLoading(false)
-      setToastMessage({
-        title: "Error",
-        body: "Error signing in",
-        type: "error"
-      })
     })
   }, [])
 
