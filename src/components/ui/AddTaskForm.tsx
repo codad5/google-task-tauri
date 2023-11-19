@@ -51,6 +51,7 @@ const AddTaskForm = () => {
         setActiveCategoryTasks(active => [newTask, ...active])
         clearForm()
         Taskobject.addToTask(newTask, taskCategoryList[activeTaskCategory].id)
+            .then((d) => {  if(!d) return console.log('task not added') })
             .then(() => { Taskobject.clearPositionCache(activeTaskCategory) })
             .then(() => {
                 Taskobject.getTasksByCategoryPosition(activeTaskCategory).then((data) => {
