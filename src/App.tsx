@@ -85,17 +85,26 @@ function App() {
 
   // check the offline data for access token
   useEffect(() => {
+    setLoading(true)
+    // get access token from storage
     getAccessTokenFromStorage().then((accessToken) => {
+      // if access token exists
       if (accessToken) {
         pushNotification("Login Successful")
         if (navigator.onLine) {
+          // fetch user profile
           fetchUserProfile(accessToken.access_token).then((profile) => {
             if (profile) {
               setProfile(profile);
               setAccessToken(accessToken.access_token);
               setLoggedIn(true);
+              setLoading(false)
               pushNotification(`welcome back ${profile.name}`)
             }
+            else {
+              throw new Error("Something went wrong, please try again");
+            }
+
           });
         }
         else {
@@ -108,8 +117,18 @@ function App() {
           }
           });
         }
+      } else {
+        throw new Error("Signin required");
       }
-    });
+    }).catch((err) => {
+      console.log(err);
+      setLoading(false)
+      setToastMessage({
+        title: "Error",
+        body: "Error signing in",
+        type: "error"
+      })
+    })
   }, [])
 
 
