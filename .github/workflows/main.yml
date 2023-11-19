@@ -21,6 +21,9 @@ jobs:
           - os: windows-latest
             rust_target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.platform }}
+    env:
+      VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+      VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -54,10 +57,21 @@ jobs:
             touch environment/apt_packages.txt
           fi
           xargs sudo apt install -y < environment/apt_packages.txt
+          sudo apt install -y libgdk-pixbuf2.0-dev
 
-      - name: Install app dependencies from lockfile and build web
+      - name: Install app dependencies
         # NOTE: comment out && yarn build if frontend does not have build script
-        run: npm install && npm run build
+        run: npm install
+      - name: Echo Environment Variables
+        run: |
+          echo $VITE_GOOGLE_CLIENT_ID
+          echo $VITE_GOOGLE_CLIENT_SECRET
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
+          
+      - name: Build frontend
+        run: npm run build
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
