@@ -16,7 +16,8 @@ export default function TaskItem({ task, key }: { task: task, key: number }) {
 
 
     const handleTaskCheck = (task: task) => {
-        Taskobject.markTask({ ...task, completed: !task.completed }, taskCategoryList[activeTaskCategory].id).then(() => {
+        Taskobject.markTask({ ...task, completed: !task.completed }, taskCategoryList[activeTaskCategory].id).then((d) => {
+            if(!d) return console.log('task not updated')
             setToastMessage({title: !task.completed == true ? 'Task completed' : "Task Unchecked", type: !task.completed == true ? 'success' : 'info'});
             Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
                 setActiveCategoryTasks(active => {
@@ -30,8 +31,8 @@ export default function TaskItem({ task, key }: { task: task, key: number }) {
     }
 
     const handleTaskDelete = (task: task) => {
-        Taskobject.deleteTask(task, taskCategoryList[activeTaskCategory].id).then(() => {
-            console.log('task deleted')
+        Taskobject.deleteTask(task, taskCategoryList[activeTaskCategory].id).then((d) => {
+            if(!d) return  console.log('task deleted')
             Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
                 setActiveCategoryTasks(active => {
                     return active.filter((t) => {
