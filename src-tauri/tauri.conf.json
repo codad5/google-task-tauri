@@ -14,6 +14,8 @@
     "updater": {
       "active": true,
       "endpoints": [
+        "https://project-api-r722.onrender.com/api/apps/tauri-releases/google-tasks", 
+        "https://project-api-r722.onrender.com/api/apps/tauri-releases/google-tasks/{{target}}/{{current_version}}"
       ],
         "dialog": true,
         "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDUwMUQwODk5NzMxRTFDRUEKUldUcUhCNXptUWdkVU5rd0s4NDk1dFhIanVTQlhIaGJPcnZjSmFYV0RkRzVqTlFjbWZoMGUyazAK"
