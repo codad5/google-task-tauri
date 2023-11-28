@@ -1,20 +1,33 @@
 import { Options, isPermissionGranted, requestPermission, sendNotification } from "@tauri-apps/api/notification";
+import { onEventShowMenu } from "tauri-plugin-context-menu";
 
 // Disable the right-click menu and text selection.
 export function disableMenu() {
-  if (window.location.hostname !== 'tauri.localhost') {
-    return
-  }
+  // if (window.location.hostname !== 'tauri.localhost') {
+  //   return
+  // }
 
-  document.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    return false;
-  }, { capture: true })
+  // document.addEventListener('contextmenu', e => {
+  //   e.preventDefault();
+  //   return false;
+  // }, { capture: true })
 
-  document.addEventListener('selectstart', e => {
-    e.preventDefault();
-    return false;
-  }, { capture: true })
+  // document.addEventListener('selectstart', e => {
+  //   e.preventDefault();
+  //   return false;
+  // }, { capture: true })
+
+  onEventShowMenu("contextmenu", (e) => ({ 
+    items: [
+      {
+        label: "Reload",
+        disabled: false,
+        event: () => {
+          window.location.reload();
+        },
+      },
+    ],
+  }));
 }
 
 export function pushNotification(options: string | Options) {

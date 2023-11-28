@@ -3,6 +3,7 @@
 
 mod libs;
 
+use tauri_plugin_log::{LogTarget};
 use libs::tauri_actions::{save_access_token,load_access_token, greet, test_command};
 use libs::filehelper::ENV_FILE;
 
@@ -12,6 +13,11 @@ fn main() {
     dotenv::from_filename(ENV_FILE).ok();
     tauri::Builder::default()
         .plugin(tauri_plugin_oauth::init())
+        .plugin(tauri_plugin_log::Builder::default().targets([
+            LogTarget::LogDir,
+            LogTarget::Stdout,
+            LogTarget::Webview,
+        ]).build())
         .invoke_handler(tauri::generate_handler![
             save_access_token,
             load_access_token,
