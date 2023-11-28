@@ -1,7 +1,7 @@
 import { invoke, shell } from "@tauri-apps/api";
 import axios from "axios";
 import { AccessToken, UserProfile } from "../types/googleapis";
-import { readTextFile, removeFile, writeTextFile } from "@tauri-apps/api/fs";
+import { readTextFile, removeFile, writeTextFile, exists } from "@tauri-apps/api/fs";
 import { CLIENT_ID, CLIENT_SECRET } from "../config/credentials";
 import settings from "../config/settings";
 
@@ -158,6 +158,8 @@ export async function saveAccessToken(accessToken: string|AccessToken) {
 
 export async function getAccessTokenFromStorage() {
     try {
+        // if file does not exist, return null
+        if(! await exists(STORAGE_PATHS.access_token, { dir: DEFAULT_DIRECTORY })) throw new Error("File does not exist");
         const accessTokenText: string = await invoke('load_access_token')
         console.log('new access token found')
         let accessToken = JSON.parse(accessTokenText) as AccessToken;

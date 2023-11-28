@@ -47,7 +47,19 @@ impl AccessToken {
         let mut file = std::fs::File::open(&*ACCESS_TOKEN_FILE).unwrap();
         let binding = env::var("DB_PASSWORD").unwrap();
         let cacoon = Cocoon::new(binding.as_bytes());
-        let encoded = cacoon.parse(&mut file).unwrap();
-        return AccessToken::try_from_slice(&encoded).unwrap();
+        return match cacoon.parse(&mut file) {
+            Ok(data) => AccessToken::try_from_slice(&data).unwrap(),
+            Err(_) => { 
+                println!("Error reading file");
+                return AccessToken {
+                    access_token: "".to_string(),
+                    expires_in: 0,
+                    refresh_token: "".to_string(),
+                    scope: "".to_string(),
+                    token_type: "".to_string(),
+                    id_token: "".to_string(),
+                };
+            }
+        };
     }
 }
