@@ -14,7 +14,7 @@ export default {
 
     storage: {
         paths: {
-            access_token: "access_token.json",
+            access_token: "access_token.db",
             tasks: "tasks.json",
             authcode: "auth_code.txt",
             user_profile: "user_profile.json",

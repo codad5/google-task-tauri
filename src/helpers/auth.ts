@@ -146,7 +146,7 @@ export async function saveAccessToken(accessToken: string|AccessToken) {
         const accessTokenText: string = typeof accessToken === "string" ? accessToken : JSON.stringify(accessToken, null, 2);
         console.log(JSON.parse(accessTokenText), "accessTokenText that was saved");
         localStorage.setItem("lastLogin", Date.now() + "");
-        return await writeTextFile(STORAGE_PATHS.access_token, accessTokenText, { dir: DEFAULT_DIRECTORY }) 
+        return await invoke("save_access_token", {token: accessTokenText});
     } catch (error) {
         console.error("Error saving access token:", error);
         localStorage.removeItem("lastLogin");
@@ -158,7 +158,8 @@ export async function saveAccessToken(accessToken: string|AccessToken) {
 
 export async function getAccessTokenFromStorage() {
     try {
-        const accessTokenText = await readTextFile(STORAGE_PATHS.access_token, { dir: DEFAULT_DIRECTORY });
+        const accessTokenText: string = await invoke('load_access_token')
+        console.log('new access token found')
         let accessToken = JSON.parse(accessTokenText) as AccessToken;
         // check if the access token is expired
         console.log(accessToken, "accessToken");
