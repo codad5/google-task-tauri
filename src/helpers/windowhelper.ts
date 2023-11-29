@@ -3,7 +3,7 @@ import {showMenu} from "tauri-plugin-context-menu";
 
 // Disable the right-click menu and text selection.
 export function loadContextmenu() {
-  if (window.location.hostname === 'tauri.localhost') {
+  if (window.location.hostname !== 'tauri.localhost') {
     return
   }
   window.addEventListener("contextmenu", (e) => {

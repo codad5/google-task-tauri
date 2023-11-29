@@ -1,9 +1,10 @@
-import { invoke, shell } from "@tauri-apps/api";
+import { shell } from "@tauri-apps/api";
 import axios from "axios";
 import { AccessToken, UserProfile } from "../types/googleapis";
 import { readTextFile, removeFile, writeTextFile, exists } from "@tauri-apps/api/fs";
 import { CLIENT_ID, CLIENT_SECRET } from "../config/credentials";
 import settings from "../config/settings";
+import { generate_oauth_port, get_access_token, get_auth_code, save_access_token, save_auth_code } from "./invoker";
 
 
 const DEFAULT_DIRECTORY = settings.fs.DEFAULT_DIRECTORY;
@@ -18,7 +19,7 @@ class PortManager {
         return this.port;
     }
     async generatePort() : Promise<number> {
-        const port = await invoke("plugin:oauth|start");
+        const port = await generate_oauth_port();
         return port as number;
     }
 }
@@ -124,7 +125,7 @@ export async function openAuthWindow() {
 // save the auth code to storage
 export async function saveAuthCode(code: string) {
     try {
-        return await writeTextFile(STORAGE_PATHS.authcode, code, { dir: DEFAULT_DIRECTORY });
+        return await save_auth_code(code);
     } catch (error) {
         console.error("Error saving auth code:", error);
         throw new Error("Error saving auth code");
@@ -134,7 +135,7 @@ export async function saveAuthCode(code: string) {
 // get the auth code from storage
 export async function getAuthCode() {
     try {
-        return await readTextFile(STORAGE_PATHS.authcode, { dir: DEFAULT_DIRECTORY });
+        return await get_auth_code();
     } catch (error) {
         console.error("Error getting auth code:", error);
         return null;
@@ -143,10 +144,8 @@ export async function getAuthCode() {
 
 export async function saveAccessToken(accessToken: string|AccessToken) {
     try {
-        const accessTokenText: string = typeof accessToken === "string" ? accessToken : JSON.stringify(accessToken, null, 2);
-        console.log(JSON.parse(accessTokenText), "accessTokenText that was saved");
         localStorage.setItem("lastLogin", Date.now() + "");
-        return await invoke("save_access_token", {token: accessTokenText});
+        return await save_access_token(accessToken);
     } catch (error) {
         console.error("Error saving access token:", error);
         localStorage.removeItem("lastLogin");
@@ -160,7 +159,7 @@ export async function getAccessTokenFromStorage() {
     try {
         // if file does not exist, return null
         if(! await exists(STORAGE_PATHS.access_token, { dir: DEFAULT_DIRECTORY })) throw new Error("File does not exist");
-        const accessTokenText: string = await invoke('load_access_token')
+        const accessTokenText: string = (await get_access_token()) as string;
         console.log('new access token found')
         let accessToken = JSON.parse(accessTokenText) as AccessToken;
         // check if the access token is expired

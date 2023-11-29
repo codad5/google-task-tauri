@@ -16,7 +16,7 @@ export default {
         paths: {
             access_token: "access_token.db",
             tasks: "tasks.json",
-            authcode: "auth_code.txt",
+            authcode: "auth_code.db",
             user_profile: "user_profile.json",
         }
     },
