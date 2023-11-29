@@ -8,7 +8,7 @@ const OsToPlatform : Record<OperationSystem, string[]> = {
     "windows": ["exe"],
     "mac": ["dmg"],
     "linux": ["AppImage", "deb"],
-    "other": [],
+    "other": ["zip", "tar.gz", "AppImage", "deb"],
     "darwin": ["dmg"],
 };
 
