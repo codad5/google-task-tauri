@@ -17,5 +17,5 @@ export default defineConfig(async () => ({
   // 3. to make use of `TAURI_DEBUG` and other env variables
   // https://tauri.studio/v1/api/config#buildconfig.beforedevcommand
   envPrefix: ["VITE_", "TAURI_"],
-  base: import.meta.env?.PROD ?? false ? "/google-task-tauri/" : "/",
+  base: window.location.hostname === "localhost" ? "/" : "/google-task-tauri/",
 }));
