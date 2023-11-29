@@ -1,8 +1,7 @@
 use tauri;
 
 // super mod imports;
-use super::access_token::AccessToken;
-use super::response::SaveAccessTokenResponse;
+use super::auth::{AccessToken, Auth};
 use super::filehelper::{ENV_FILE, ACCESS_TOKEN_FILE};
 
 
@@ -34,19 +33,25 @@ pub fn greet(name: String) -> String {
 #[tauri::command]
 pub fn save_access_token(token: String) -> String {
     dotenv::from_filename(ENV_FILE).ok();
-    let content : AccessToken = serde_json::from_str(&token).unwrap();
-    let response : SaveAccessTokenResponse = content.save();
-    // Serialize the response object to JSON and return as a string
-    serde_json::to_string(&response).expect("JSON serialization error")
+    return Auth::save_access_token(token);
 }
 
 // a command to load the access token from the file
 #[tauri::command]
 pub fn load_access_token() -> String {
     dotenv::from_filename(ENV_FILE).ok();
-    let response : AccessToken = AccessToken::load();
-    println!("response: {:?}", response);
-    // Serialize the response object to JSON and return as a string
-    serde_json::to_string(&response).expect("JSON serialization error")
+    return Auth::load_access_token();
 }
 
+
+#[tauri::command]
+pub fn save_code(code: String) -> String {
+    dotenv::from_filename(ENV_FILE).ok();
+    return Auth::save_auth_code(code);
+}
+
+#[tauri::command]
+pub fn load_code() -> String {
+    dotenv::from_filename(ENV_FILE).ok();
+    return Auth::load_auth_code();
+}

@@ -3,22 +3,16 @@ import { Box, Button, Spinner, useToast  } from '@chakra-ui/react'
 import { listen } from "@tauri-apps/api/event";
 import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken } from "./helpers/auth";
 import { AccessToken, UserProfile } from "./types/googleapis";
-import { disableMenu, pushNotification } from "./helpers/windowhelper";
+import { loadContextmenu , pushNotification } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, attemptLoginState, attemptLogoutState, loggedInState, messageState, userProfileState } from "./config/states";
 import Header from "./components/ui/Header";
 import { task } from "./types/taskapi";
+import { listen_for_auth_code } from "./helpers/eventlistner";
 
 // disable default context menu on build
-disableMenu();
-
-
-pushNotification({
-  title: 'Hello World',
-  body: 'This is a notification from Tauri!',
-  icon: 'https://tauri.studio/favicon.ico'
-})
+loadContextmenu();
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,23 +49,20 @@ function App() {
 
   // to generate a port and listen to it
   useEffect(() => {
-    listen("oauth://url", async (data) => {
-      try {
-        console.log(data, "data");
-        if (!data.payload) return;
-        const url = new URL(data.payload as string);
-        const code = new URLSearchParams(url.search).get("code");
+    listen_for_auth_code({
+      onSucess: (code) => {
         console.log(code);
         if (code) {
           saveAuthCode(code).then(() => {
             console.log("code saved");
           });
-          const accessTokenBody = await getAccessToken(code);
-          console.log(accessTokenBody);
-          await handleLoadFrom(accessTokenBody);
+          getAccessToken(code).then((accessTokenBody) => {
+            handleLoadFrom(accessTokenBody)
+          });
         }
-      } catch (err) {
-        console.log("error", err);
+      }, 
+      onError: (err) => {
+        console.log(err);
         setLoading(false)
         setToastMessage({
           title: "Error",
@@ -88,7 +79,6 @@ function App() {
     setLoading(true)
     // get access token from storage
     getAccessTokenFromStorage().then((accessToken) => {
-      // if access token exists
       try {
         if (!accessToken) throw new Error("Signin required");
           pushNotification("Login Successful")

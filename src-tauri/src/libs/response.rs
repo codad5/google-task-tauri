@@ -1,4 +1,4 @@
-use super::access_token::AccessToken;
+use super::auth::AccessToken;
 // save token response 
 #[derive(serde::Serialize)]
 pub struct SaveTokenResponse {

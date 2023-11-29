@@ -4,14 +4,14 @@
 mod libs;
 
 use tauri_plugin_log::{LogTarget};
-use libs::tauri_actions::{save_access_token,load_access_token, greet, test_command};
-use libs::filehelper::ENV_FILE;
-
+use libs::tauri_actions::{save_access_token,load_access_token, greet, test_command, save_code, load_code};
+use libs::filehelper::{ENV_FILE};
 
 
 fn main() {
     dotenv::from_filename(ENV_FILE).ok();
     tauri::Builder::default()
+        .plugin(tauri_plugin_context_menu::init())
         .plugin(tauri_plugin_oauth::init())
         .plugin(tauri_plugin_log::Builder::default().targets([
             LogTarget::LogDir,
@@ -22,7 +22,9 @@ fn main() {
             save_access_token,
             load_access_token,
             greet,
-            test_command
+            test_command,
+            save_code,
+            load_code,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -5,6 +5,7 @@ import { GlobalCacheManager } from "./cacher";
 import settings from "../config/settings";
 const DEFAULT_DIRECTORY = settings.fs.DEFAULT_DIRECTORY;
 const TASKS_FILE = settings.storage.paths.tasks;
+const TASK_ENDPOINT = settings.api.endpoints.TASKS;
 
 
 
@@ -13,7 +14,7 @@ const TASKS_FILE = settings.storage.paths.tasks;
 /**
  * This is a class that helps to manage the cache of the task categories
  */
-class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
+class TaskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
     /**
      * This is a object that stores the last update of the tasks by position or category id
      */
@@ -25,7 +26,7 @@ class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
     /**
      * This is a getter for the taskCategoryList
      * @returns taskCategory[]
-     * @memberof taskCategoryCacheManager
+     * @memberof TaskCategoryCacheManager 
      * @override
      */
     get() : taskCategory[] {
@@ -35,7 +36,7 @@ class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
     /**
      * This is a setter for the taskCategoryList
      * @param {taskCategory[]} value
-     * @memberof taskCategoryCacheManager
+     * @memberof TaskCategoryCacheManager 
      * @override
      */
     set(value: taskCategory[]) {
@@ -45,7 +46,7 @@ class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
     /**
      * This is a updater for the taskCategoryList
      * @param {taskCategory[]} value
-     * @memberof taskCategoryCacheManager
+     * @memberof TaskCategoryCacheManager 
      * @override
      */
 
@@ -56,7 +57,7 @@ class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
     /**
      * This is a setter for the taskCategoryList
      * @param {taskCategory[]} value
-     * @memberof taskCategoryCacheManager
+     * @memberof TaskCategoryCacheManager 
      * @override
      */
 
@@ -69,7 +70,7 @@ class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
      * This is a getter for the taskCategoryList
      * @param {number|string} positionOrCategoryID
      * @returns Date | null
-     * @memberof taskCategoryCacheManager
+     * @memberof TaskCategoryCacheManager 
      * @override
      */
 
@@ -80,7 +81,7 @@ class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
     /**
      * This is a getter to get the last update of the taskCategoryList
      * @returns Date | null
-     * @memberof taskCategoryCacheManager
+     * @memberof TaskCategoryCacheManager 
      * @override
      */
     lastUpdate() {
@@ -90,7 +91,7 @@ class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
     /**
      * This is a method to clear the cache of the taskCategoryList
      * @param {number|string} positionOrCategoryID
-     * @memberof taskCategoryCacheManager
+     * @memberof TaskCategoryCacheManager 
      * @override
      */
 
@@ -108,10 +109,10 @@ class taskCategoryCacheManager extends GlobalCacheManager<taskCategory[]> {
 }
 
 /**
- * This is a instance of the taskCategoryCacheManager
- * @type {taskCategoryCacheManager}
+ * This is a instance of the TaskCategoryCacheManager 
+ * @type {TaskCategoryCacheManager }
  */
-const cacheManager = new taskCategoryCacheManager();
+const cacheManager = new TaskCategoryCacheManager();
 
 
 
@@ -140,16 +141,16 @@ export class Task {
      * @default "https://tasks.googleapis.com/tasks/v1"
      * @todo make this private
      */
-    baseUrl: string = "https://tasks.googleapis.com/tasks/v1";
+    baseUrl: string = TASK_ENDPOINT;
     /**
      * This is a object that stores the last update of the tasks by position or category id
-     * @type {taskCategoryCacheManager}
+     * @type {TaskCategoryCacheManager}
      * @memberof Task
      * @private
      * @readonly
      * @todo make this private
      */
-    private tasksCategoryList: taskCategoryCacheManager = cacheManager;
+    private tasksCategoryList: TaskCategoryCacheManager = cacheManager;
 
     private errorHandler: (error: Error) => void = () => {};
     // lastUpdate: { [key: number|string]: Date } = {};
@@ -189,24 +190,16 @@ export class Task {
     async getTaskCategories() {
         try {
             if (!this.accessToken) throw new Error("Access token not found");
-            let tasks = null;
-            // check if online and get tasks from api
-            if (navigator.onLine) {
-                tasks = await this.getTasksFromApi(this.accessToken);
-            } else {
-                // get tasks from file
-                tasks = await this.getTasksFromFile();
-            }
-            if (tasks) {
-                this.tasksCategoryList.set(tasks.map((taskCategory) => {
-                    // if category with same id exists, merge them
-                    const existingCategory = this.tasksCategoryList.get()?.find((category) => category.id === taskCategory.id);
-                    if (existingCategory) {
-                        taskCategory.tasks = [...existingCategory.tasks || [], ...taskCategory.tasks || []];
-                    }
-                    return taskCategory;
-                }))
-            }
+            let tasks = navigator.onLine ? await this.getTasksFromApi(this.accessToken) : await this.getTasksFromFile();
+            if (!tasks) tasks = []
+            this.tasksCategoryList.set(tasks.map((taskCategory) => {
+                // if category with same id exists, merge them
+                const existingCategory = this.tasksCategoryList.get()?.find((category) => category.id === taskCategory.id);
+                if (existingCategory) {
+                    taskCategory.tasks = [...existingCategory.tasks || [], ...taskCategory.tasks || []];
+                }
+                return taskCategory;
+            }))
             return tasks;
         } catch (error) {
             console.error("Error getting tasks:", error);
@@ -370,7 +363,7 @@ export class Task {
         // console.log(task.completed, "mark task");
         try {
             if(!navigator.onLine) throw new Error("No internet connection");
-            const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks/${task.id}`
+            const url = `${this.baseUrl}/lists/${categoryID}/tasks/${task.id}`
             const response = await axios.put(url, {
                 id: task.id,
                 title: task.name,
@@ -393,7 +386,7 @@ export class Task {
     async addToTask(task: task, categoryID: string) {
         try {
             if(!navigator.onLine) throw new Error("No internet connection");
-            const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks`
+            const url = `${this.baseUrl}/lists/${categoryID}/tasks`
             const response = await axios.post(url, {
                 title: task.name,
             }, {
@@ -413,7 +406,7 @@ export class Task {
     async deleteTask(task: task, categoryID: string) {
         try {
             if (!navigator.onLine) throw new Error("No internet connection");
-            const url = `https://tasks.googleapis.com/tasks/v1/lists/${categoryID}/tasks/${task.id}`
+            const url = `${this.baseUrl}/lists/${categoryID}/tasks/${task.id}`
             const response = await axios.delete(url, {
                 headers: {
                     Authorization: `Bearer ${this.accessToken}`,

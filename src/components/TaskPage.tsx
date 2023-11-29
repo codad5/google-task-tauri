@@ -64,20 +64,21 @@ export default function TaskPage() {
         <Tabs variant='soft-rounded' colorScheme='green' h='80%'>
           <TaskCategoryList />
         {
-          loading ? <Box p={4} h='90%' display='flex' justifyContent='center' alignItems='center'>
-            <Spinner size='xl' /> 
-          </Box> : (
-          <Box p={4} h='90%'>
-            <TabPanels>
-              <TaskList />
-            { taskCategoryList.length > 0 && activeTaskCategory >= 0 &&
-             (
-                <AddTaskForm />
-              )
-            }
-            </TabPanels>
-            </Box>
-          )
+          loading || taskCategoryList.length <= 0 ? (
+            <Box p={4} h='90%' display='flex' justifyContent='center' alignItems='center'>
+              <Spinner size='xl' /> 
+            </Box>) : (
+            <Box p={4} h='90%'>
+              <TabPanels>
+                <TaskList />
+              { taskCategoryList.length > 0 && activeTaskCategory >= 0 &&
+              (
+                  <AddTaskForm />
+                )
+              }
+              </TabPanels>
+              </Box>
+            )
         }
         </Tabs>
     </div>

@@ -20,4 +20,10 @@ export default {
             user_profile: "user_profile.json",
         }
     },
+    api: {
+        endpoints: {
+            TASKS: "https://tasks.googleapis.com/tasks/v1",
+            USER_INFO: "https://www.googleapis.com/oauth2/v3/userinfo",
+        }
+    }
 };
