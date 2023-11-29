@@ -1,4 +1,4 @@
-import { Box, Center, Heading, Image, Link, Text, Flex, IconButton  } from '@chakra-ui/react';
+import { Box, Center, Heading, Image, Link, Text, Flex, IconButton, Highlight  } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { FaGithub } from "react-icons/fa";
@@ -49,9 +49,15 @@ function App() {
             </Center>  
           </Box>
           <Box w="100%" p={0} >
-            <Center w='100%' h="100%">
-              <Text>
-                This is an Unofficial Google Task Desktop Client. It is not affiliated with Google. It is built with <Link href="https://tauri.app/" isExternal>Tauri</Link> and <Link href="https://reactjs.org/" isExternal>React</Link>.
+            <Center w='100%' h="100%" p={2}>
+              <Text textAlign="center">
+                <Highlight
+                  query='Desktop Client'
+                  styles={{ px: '2', py: '1', rounded: 'full', bg: 'red.100' }}
+                >
+                This is an Unofficial Google Task Desktop Client. It is not affiliated with Google. It is built with 
+                </Highlight>
+                <Link href="https://tauri.app/" isExternal>Tauri</Link> and <Link href="https://reactjs.org/" isExternal>React</Link>.
               </Text>
             </Center>
           </Box>
