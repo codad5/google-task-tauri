@@ -11,7 +11,7 @@ function App() {
   const [rateLimit, setRateLimit] = useRecoilState(requestCount);
 
   useEffect(() => {
-    console.log('platformLatestDataInfo', platformLatestDataInfo);
+    if (platformLatestDataInfo) return;
     const interval = setInterval(() => {
       if (platformLatestDataInfo || rateLimit > 5) {
         clearInterval(interval);
@@ -24,14 +24,14 @@ function App() {
         setPlatformLatestData(null);
       }).finally(() => {
         setRateLimit((prev) => prev + 1);
-        console.log('rateLimit', rateLimit);
       })
     }, 3000);
-    if(platformLatestDataInfo || rateLimit > 5) clearInterval(interval);
+    return () => clearInterval(interval);
   }, [platformLatestDataInfo])
 
 
   useEffect(() => {
+    if(platformLatestDataInfo) return;
     console.log('rateLimit changed', rateLimit);
     if (rateLimit <= 5 || platformLatestDataInfo) return;
     setPlatformLatestData({
