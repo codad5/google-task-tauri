@@ -39,9 +39,9 @@ export async function getLatestJson(): Promise<githubLatestReleaseData|null> {
     console.log("json from local storage ", latestJson);
     return fetch(API_URL).then((response) => {
         // check response status
-        console.log(response);
         if (response.status !== 200) return null;
         const res = response.json()
+        console.log(res);
         localStorage.setItem("latestJson", JSON.stringify(res));
         return res
     });

@@ -6,6 +6,11 @@ export const platformLatestData = atom<PlatformData | null>({
     default: null,
 });
 
+export const requestCount = atom<number>({
+    key: 'requestCount',
+    default: 0,
+});
+
 
 export const platformLatestDataSelector = selector<PlatformData | null>({
     key: 'platformLatestDataSelector',
@@ -20,5 +25,13 @@ export const lastestVersion = selector<string | null>({
     get: ({ get }) => {
         const platformData = get(platformLatestData);
         return platformData?.version ?? null;
+    },
+});
+
+export const requestCountSelector = selector<number>({
+    key: 'requestCountSelector',
+    get: ({ get }) => {
+        const count = get(requestCount);
+        return count;
     },
 });

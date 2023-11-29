@@ -2,19 +2,51 @@ import { Box, Center, Heading, Image, Link, Text, Flex, IconButton, Highlight  }
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { FaGithub } from "react-icons/fa";
-import { platformLatestData } from './states';
+import { platformLatestData, requestCount } from './states';
 import { getLatestVersionDataFOrThisPlatform } from './libs/helper';
 import DownloadButton from './components/DownloadButton';
 
 function App() {
   const [platformLatestDataInfo, setPlatformLatestData] = useRecoilState(platformLatestData);
+  const [rateLimit, setRateLimit] = useRecoilState(requestCount);
 
   useEffect(() => {
-    if(platformLatestDataInfo) return;
-    getLatestVersionDataFOrThisPlatform().then((data) => {
-      setPlatformLatestData(data);
-    })
+    console.log('platformLatestDataInfo', platformLatestDataInfo);
+    const interval = setInterval(() => {
+      if (platformLatestDataInfo || rateLimit > 5) {
+        clearInterval(interval);
+        return;
+      }
+      getLatestVersionDataFOrThisPlatform().then((data) => {
+        setPlatformLatestData(data);
+      }).catch((err) => {
+        console.log(err);
+        setPlatformLatestData(null);
+      }).finally(() => {
+        setRateLimit((prev) => prev + 1);
+        console.log('rateLimit', rateLimit);
+      })
+    }, 3000);
+    if(platformLatestDataInfo || rateLimit > 5) clearInterval(interval);
   }, [platformLatestDataInfo])
+
+
+  useEffect(() => {
+    console.log('rateLimit changed', rateLimit);
+    if (rateLimit <= 5 || platformLatestDataInfo) return;
+    setPlatformLatestData({
+      platform: 'other',
+      version: '0.0.0',
+      url: 'https://github.com/coad5/google-task-tauri/releases',
+      date: new Date().toISOString(),
+    })
+    setTimeout(() => {
+      setRateLimit(0);
+    }, 1000 * 60 * 60 * 24);
+  }, [rateLimit])
+
+
+
 
   return (
     <div className="">
