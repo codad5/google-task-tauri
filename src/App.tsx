@@ -1,6 +1,5 @@
 import { useState , useEffect} from "react";
 import { Box, Button, Spinner, useToast  } from '@chakra-ui/react'
-import { listen } from "@tauri-apps/api/event";
 import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken } from "./helpers/auth";
 import { AccessToken, UserProfile } from "./types/googleapis";
 import { loadContextmenu , pushNotification } from "./helpers/windowhelper";
