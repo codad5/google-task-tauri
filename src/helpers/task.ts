@@ -236,36 +236,79 @@ export class Task {
         return JSON.parse(tasks);
     }
 
+    /// newly refactored 
     async getTasksByCategoryPosition(position: number) {
         try {
-            let tasks = null;
-            let readfromfile = false;
-            // if the lastTaskCategoryByPosition is less than 2 minutes, return the tasks
-            let cacheLastUpdate = this.tasksCategoryList.getTaskLastUpdate(position);
-            if (cacheLastUpdate && ((new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000)) || !navigator.onLine) {
-            // if (this.lastUpdate[position] && (new Date().getTime() - this.lastUpdate[position].getTime()) < (45 * 1000)) {
-                tasks = await this.getTasksByCategoryPositionFromFile(position);
-                readfromfile = true;
-            }
-            else if (navigator.onLine) {
-                tasks = await this.getTasksByCategoryPositionFromApi(position);
-            } else {
-                tasks = await this.getTasksByCategoryPositionFromFile(position);
-                readfromfile = true;
-            }
-            // this.tasksCategoryList[position] = { ...this.tasksCategoryList[position], tasks };
-            let newTask = this.tasksCategoryList.get();
-            newTask[position] = { ...newTask[position], tasks };
-            this.tasksCategoryList.update(newTask);
-            console.log(this.tasksCategoryList, "this.tasks", "after if");
-            if(!readfromfile) await this.saveTasksToFile();
+            const tasks = await this.retrieveTasksByCategoryPosition(position);
+            this.updateTaskCategoryList(position, tasks);
+            await this.saveTasksToFileIfNeeded(!tasks); // Save to file if tasks are not retrieved
             return tasks;
         } catch (error) {
-            console.error("Error getting tasks by category position:", error);
+            console.error("Error getting tasks by category position:", (error as Error).message);
             this.errorHandler(error as Error);
             return [];
         }
     }
+
+    /**
+     * Updates the task category list with the retrieved tasks for a specific position.
+     * @param {number} position - The position of the category.
+     * @param {task[]} tasks - The list of tasks.
+     */
+    updateTaskCategoryList(position: number, tasks: task[]) {
+        const currentTaskList = this.tasksCategoryList.get();
+        currentTaskList[position] = { ...currentTaskList[position], tasks };
+        this.tasksCategoryList.update(currentTaskList);
+    }
+
+    /**
+     * Saves tasks to the local file if needed.
+     * @param {boolean} condition - The condition to determine if saving is needed.
+     */
+    async saveTasksToFileIfNeeded(condition: boolean) {
+        if (condition) {
+            await this.saveTasksToFile();
+        }
+    }
+
+
+
+    /**
+     * Retrieves tasks by category position from either the API or the local file.
+     * @param {number} position - The position of the category.
+     * @returns {task[]} - The list of tasks.
+     */
+    async retrieveTasksByCategoryPosition(position: number): Promise<task[]> {
+        const cacheLastUpdate = this.tasksCategoryList.getTaskLastUpdate(position);
+        const isCacheValid = cacheLastUpdate && ((new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000)) || !navigator.onLine;
+
+        if (isCacheValid) {
+            return await this.getTasksByCategoryPositionFromFile(position);
+        } else if (navigator.onLine) {
+            return await this.getTasksByCategoryPositionFromApi(position);
+        } else {
+            return await this.getTasksByCategoryPositionFromFile(position);
+        }
+    }
+
+    /**
+     * Retrieves tasks by category ID from either the API or the local file.
+     * @param {string} categoryID - The ID of the category.
+     * @returns {task[]} - The list of tasks.
+     */
+    async retrieveTasksByCategoryID(categoryID: string): Promise<task[]> {
+        const cacheLastUpdate = this.tasksCategoryList.getTaskLastUpdate(categoryID);
+        const isCacheValid = cacheLastUpdate && ((new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000) || !navigator.onLine);
+
+        if (isCacheValid) {
+            return await this.getTaskByIdFromFile(categoryID);
+        } else if (navigator.onLine) {
+            return await this.getTaskByIdFromApi(categoryID);
+        } else {
+            return await this.getTaskByIdFromFile(categoryID);
+        }
+    }
+
 
     async getTasksByCategoryPositionFromApi(position: number): Promise<task[]> {
         if(!navigator.onLine) throw new Error("No internet connection");
@@ -277,60 +320,75 @@ export class Task {
                 Authorization: `Bearer ${this.accessToken}`,
             },
         });
-        const tasks: task[] = response.data.items.map((item: any) => {
-            return {
-                id: item.id,
-                name: item.title,
-                description: item.notes,
-                dueDate: item.due,
-                completed: item.status === "completed",
-            };
-        });
+        const tasks: task[] = this.mapTasksFromApiResponse(response.data.items);
         this.tasksCategoryList.setTaskLastUpdate(position, new Date());
         return tasks;
     }
 
+    /**
+     * Maps tasks from API response.
+     * @param {object[]} apiResponseItems - The items from the API response.
+     * @returns {task[]} - The mapped tasks.
+     */
+    mapTasksFromApiResponse(apiResponseItems: object[]): task[] {
+        return apiResponseItems.map((item: any) => ({
+            id: item.id,
+            name: item.title,
+            description: item.notes,
+            dueDate: item.due,
+            completed: item.status === "completed",
+        }));
+    }
+
+
+    /**
+     * Gets tasks by category position from a local file.
+     * @param {number} position - The position of the category.
+     * @returns {task[]} - The list of tasks.
+     */
     async getTasksByCategoryPositionFromFile(position: number): Promise<task[]> {
         const tasks = await readTextFile(`tasks.json`, { dir: DEFAULT_DIRECTORY });
         const taskCategories = JSON.parse(tasks);
-        console.log(taskCategories, "taskCategories");
         return taskCategories[position].tasks;
     }
 
-    async getTaskById(categoryID: string) {
+    async getTasksByCategoryID(categoryID: string) {
         try {
-            let task: task[] = []
-            let readfromfile = false;
-            
-            // if the lastTaskCategoryByPosition is less than 2 minutes, return the tasks
-            let cacheLastUpdate = this.tasksCategoryList.getTaskLastUpdate(categoryID);
-            if (cacheLastUpdate && ((new Date().getTime() - cacheLastUpdate.getTime()) < (45 * 1000) || !navigator.onLine)) { 
-                task = await this.getTaskByIdFromFile(categoryID);
-                readfromfile = true;
-                // console.log("from file", task);
-            }
-            // check if online and get tasks from api
-            else if (navigator.onLine) {
-                task = await this.getTaskByIdFromApi(categoryID);
-            } else {
-                task = await this.getTaskByIdFromFile(categoryID);
-                readfromfile = true;
-            }
-            let newTask = this.tasksCategoryList.get().map((taskCategory) => {
-                if (taskCategory.id === categoryID) {
-                    taskCategory.tasks = task;
-                }
-                return taskCategory;
-            });
-            this.tasksCategoryList.update(newTask);
-            if(!readfromfile) await this.saveTasksToFile();
-            return task;
+            let tasks: task[] = [];
+            let readFromFile = false;
+
+            tasks = await this.retrieveTasksByCategoryID(categoryID);
+
+            this.updateTaskCategoryTasks(categoryID, tasks);
+            await this.saveTasksToFileIfNeeded(!readFromFile);
+
+            return tasks;
         } catch (error) {
-            // console.error(error);
             this.errorHandler(error as Error);
-            return null;
+            return [];
         }
     }
+
+    /**
+     * Updates the tasks for a specific task category.
+     * @param {string} categoryID - The ID of the task category.
+     * @param {task[]} tasks - The tasks to update.
+     */
+    updateTaskCategoryTasks(categoryID: string, tasks: task[]) {
+        const updatedTaskCategories = this.tasksCategoryList.get().map((taskCategory) => {
+            if (taskCategory.id === categoryID) {
+                taskCategory.tasks = tasks;
+            }
+            return taskCategory;
+        });
+
+        this.tasksCategoryList.update(updatedTaskCategories);
+    }
+
+
+    
+    /// end of newly refactored
+
 
     async getTaskByIdFromApi(categoryID: string): Promise<task[]> {
         if(!navigator.onLine) throw new Error("No internet connection");
