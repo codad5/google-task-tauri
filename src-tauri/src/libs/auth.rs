@@ -24,7 +24,7 @@ pub struct AccessToken {
 impl AccessToken {
     pub fn save(&self) -> SaveAccessTokenResponse {
         let encoded = to_vec(self).unwrap();
-        let password: String = env::var("DB_PASSWORD").unwrap_or_else(|_| "default_password".to_string());
+        let password: String = env::var("DB_PASSWORD").unwrap();
         let mut cocoon = Cocoon::new(password.as_bytes());
         println!("About to open db file");
         let mut file = std::fs::OpenOptions::new()
@@ -41,7 +41,7 @@ impl AccessToken {
 
     pub fn load() -> AccessToken {
         let mut file = std::fs::File::open(&*ACCESS_TOKEN_FILE).unwrap();
-        let binding = env::var("DB_PASSWORD").unwrap_or_else(|_| "default_password".to_string());
+        let binding = env::var("DB_PASSWORD").unwrap();
         let cacoon = Cocoon::new(binding.as_bytes());
         return match cacoon.parse(&mut file) {
             Ok(data) => AccessToken::try_from_slice(&data).unwrap(),
@@ -66,7 +66,7 @@ pub struct Auth;
 impl Auth {
     pub fn save_auth_code(code: String) -> String {
         let encoded = to_vec(&code).unwrap();
-        let password: String = env::var("DB_PASSWORD").unwrap_or_else(|_| "default_password".to_string());
+        let password: String = env::var("DB_PASSWORD").unwrap();
         let mut cocoon = Cocoon::new(password.as_bytes());
         println!("About to open db file");
         let mut file = std::fs::OpenOptions::new()
@@ -84,7 +84,7 @@ impl Auth {
 
     pub fn load_auth_code() -> String {
         let mut file = std::fs::File::open(&*AUTH_CODE_FILE).unwrap();
-        let binding = env::var("DB_PASSWORD").unwrap_or_else(|_| "default_password".to_string());
+        let binding = env::var("DB_PASSWORD").unwrap();
         let cacoon = Cocoon::new(binding.as_bytes());
         return match cacoon.parse(&mut file) {
             Ok(data) => String::try_from_slice(&data).unwrap(),
