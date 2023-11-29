@@ -19,3 +19,4 @@ export default defineConfig(async () => ({
   envPrefix: ["VITE_", "TAURI_"],
   base: "/google-task-tauri/"
 }));
+
