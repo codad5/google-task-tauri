@@ -34,13 +34,16 @@ export function getOperationSystem() : OperationSystem {
 }
 
 export async function getLatestJson(): Promise<githubLatestReleaseData|null> {
-    const latestJson = localStorage.getItem("latestJson");
-    if (latestJson) return JSON.parse(latestJson);
+    const latestJson = localStorage.getItem("latestJson") as string;
+    if (latestJson && JSON.parse(latestJson).assets) return JSON.parse(latestJson);
+    console.log("json from local storage ", latestJson);
     return fetch(API_URL).then((response) => {
-        localStorage.setItem("latestJson", JSON.stringify(response.json()));
         // check response status
+        console.log(response);
         if (response.status !== 200) return null;
-        return response.json()
+        const res = response.json()
+        localStorage.setItem("latestJson", JSON.stringify(res));
+        return res
     });
 }
 
