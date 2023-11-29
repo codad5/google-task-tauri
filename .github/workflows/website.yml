@@ -29,7 +29,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          
-      - name: Deploy website
-        run: npm run deploy
+          publish_dir: ./build
