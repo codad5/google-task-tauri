@@ -1,5 +1,5 @@
 import { IconButton, Button, FormControl, FormLabel, Input, ButtonGroup, Box, Popover, useDisclosure, PopoverTrigger, PopoverContent, FocusLock, PopoverArrow, PopoverCloseButton, Stack} from '@chakra-ui/react'
-import { CheckIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import { useRef } from 'react'
 import { useRecoilValue , useSetRecoilState} from 'recoil'
 import { taskObjectSelector, taskCategoriesListState } from '../../config/states'
@@ -64,7 +64,7 @@ export default function AddCategoryComponent() {
                             colorScheme='teal'
                             aria-label='Done'
                             size='sm'
-                            icon={<CheckIcon />}
+                            icon={<AddIcon />}
                         />
                     </PopoverTrigger>
                     <PopoverContent p={5}>
