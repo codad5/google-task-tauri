@@ -1,10 +1,10 @@
-import { Box, Center, Heading, Image, Link, Text, Flex, IconButton, Highlight  } from '@chakra-ui/react';
+import { Box, Center, Heading, Image, Link, Text, Highlight  } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { FaGithub } from "react-icons/fa";
 import { platformLatestData, requestCount } from './states';
 import { getLatestVersionDataFOrThisPlatform } from './libs/helper';
 import DownloadButton from './components/DownloadButton';
+import Header from './components/Header';
 
 function App() {
   const [platformLatestDataInfo, setPlatformLatestData] = useRecoilState(platformLatestData);
@@ -50,24 +50,7 @@ function App() {
 
   return (
     <div className="">
-      <Box w="100%" p={2} h="10vh">
-        <Flex>
-          <Box flexBasis='70%'>
-          </Box>
-          <Box flexBasis='30%' p={2} h="100%">
-            <Center w='100%' h="100%">
-              <Link href="https://github.com/codad5/google-task-tauri" isExternal>
-                <IconButton
-                  variant='outline'
-                  colorScheme='teal'
-                  aria-label='Send email'
-                  icon={<FaGithub />}
-                  />
-              </Link>
-            </Center>
-          </Box>
-        </Flex>
-      </Box>
+      <Header />
       <Box w="100%" p={0} h="90vh" pt="10vh">
         <Box w="100%" p={0} h="40vh">
             <Box w="100%" p={0} >
