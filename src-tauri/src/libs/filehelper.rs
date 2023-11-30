@@ -6,6 +6,17 @@ use tauri::Env;
 
 pub const ENV_FILE: &str = "../.env.local";
 
+pub const USERS_FILES: [&str; 4] = ["access_token.db", "auth_code.db", "tasks.json", "user_profile.json"];
+
+
+
+
+pub fn initialize_user_files() {
+    for file in USERS_FILES.iter() {
+        let file_path = get_app_local_data_dir(file);
+        println!("file path: {}", file_path);
+    }
+}
 
 // const PATHS = 
 pub fn get_app_local_data_dir(file_name: &str) -> String {
@@ -19,13 +30,18 @@ pub fn get_app_local_data_dir(file_name: &str) -> String {
         Some(BaseDirectory::AppLocalData),
     ).expect("failed to resolve path");
     let path = path.to_str().unwrap().to_string();
+    println!("path: {} \n file name: {} \n", path, file_name);
     // check if file exists
     if !std::path::Path::new(file_name).exists() {
         println!("File does not exist, creating file {} for {}", file_name, path);
         // create file
-        let mut file = std::fs::File::create(file_name).unwrap();
-        // write empty array to file
-        file.write_all("".as_bytes()).unwrap();
+        let mut file = std::fs::File::create(&path).unwrap();
+        // if a json file, write empty json
+        if file_name.ends_with(".json") {
+            println!("writing empty json");
+            file.write_all(b"{}").unwrap();
+        }
+
     }
     path
 }

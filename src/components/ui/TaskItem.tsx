@@ -6,7 +6,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { taskObjectState, taskCategoriesListSelector, activeTaskCategorySelector, activeCategoryTasksState, messageState } from "../../config/states";
 
 
-export default function TaskItem({ task, key }: { task: task, key: number }) {
+export default function TaskItem({ task }: { task: task }) {
     const [isHovered, setIsHovered] = useState(false);
     const Taskobject = useRecoilValue(taskObjectState) 
     const taskCategoryList: taskCategory[] = useRecoilValue<taskCategory[]>(taskCategoriesListSelector)
@@ -44,7 +44,7 @@ export default function TaskItem({ task, key }: { task: task, key: number }) {
     }
         
     return (
-        <Box p="2" key={key} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+        <Box p="2"  onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
             <Flex >
                 <Checkbox isChecked={task.completed} onChange={() => handleTaskCheck(task)} paddingRight="1">
                     <Box w="90%" as="span" textDecoration={task.completed ? "line-through" : "none"}>

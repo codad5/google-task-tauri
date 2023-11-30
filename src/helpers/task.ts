@@ -233,7 +233,13 @@ export class Task {
 
     async getTasksFromFile(): Promise<taskCategory[]> {
         const tasks = await readTextFile(TASKS_FILE, { dir: DEFAULT_DIRECTORY });
-        return JSON.parse(tasks);
+        // check if a valid json
+        try {
+            return JSON.parse(tasks);
+        } catch (error) {
+            console.error("Error parsing tasks:", error);
+            return [];
+        }
     }
 
     /// newly refactored 
@@ -241,7 +247,7 @@ export class Task {
         try {
             const tasks = await this.retrieveTasksByCategoryPosition(position);
             this.updateTaskCategoryList(position, tasks);
-            await this.saveTasksToFileIfNeeded(!tasks); // Save to file if tasks are not retrieved
+            await this.saveTasksToFileIfNeeded(tasks.length > 0);
             return tasks;
         } catch (error) {
             console.error("Error getting tasks by category position:", (error as Error).message);
@@ -347,7 +353,7 @@ export class Task {
      * @returns {task[]} - The list of tasks.
      */
     async getTasksByCategoryPositionFromFile(position: number): Promise<task[]> {
-        const tasks = await readTextFile(`tasks.json`, { dir: DEFAULT_DIRECTORY });
+        const tasks = await readTextFile(TASKS_FILE, { dir: DEFAULT_DIRECTORY });
         const taskCategories = JSON.parse(tasks);
         return taskCategories[position].tasks;
     }
@@ -412,7 +418,7 @@ export class Task {
     }
 
     async getTaskByIdFromFile(categoryID: string): Promise<task[]> {
-        const tasks = await readTextFile(`tasks.json`, { dir: DEFAULT_DIRECTORY });
+        const tasks = await readTextFile(TASKS_FILE, { dir: DEFAULT_DIRECTORY });
         const taskCategories = JSON.parse(tasks);
         return taskCategories.find((taskCategory: taskCategory) => taskCategory.id === categoryID).tasks;
     }
@@ -478,6 +484,27 @@ export class Task {
             return null;
         }
     }
+
+    async addNewTaskCategory(title: string) {
+        try {
+            if (!navigator.onLine) throw new Error("No internet connection");
+            const url = `${this.baseUrl}/users/@me/lists`
+            const response = await axios.post(url, {
+                title,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${this.accessToken}`,
+                },
+            });
+            // console.log(response.data, "add task");
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            this.errorHandler(error as Error);
+            return null;
+        }
+    }
+
 
     async clearPositionCache(position: number) {
         console.log("clearing cache", position);

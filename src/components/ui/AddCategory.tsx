@@ -1,12 +1,28 @@
 import { IconButton, Button, FormControl, FormLabel, Input, ButtonGroup, Box, Popover, useDisclosure, PopoverTrigger, PopoverContent, FocusLock, PopoverArrow, PopoverCloseButton, Stack} from '@chakra-ui/react'
 import { CheckIcon } from '@chakra-ui/icons'
-import React, { useRef } from 'react'
+import { useRef } from 'react'
+import { useRecoilValue , useSetRecoilState} from 'recoil'
+import { taskObjectSelector, taskCategoriesListState } from '../../config/states'
 
 
 
 const Form = ({categoryNameRef, onCancel}: {categoryNameRef: React.RefObject<HTMLInputElement>, onCancel: () => void}) => {
+    
+    const taskObject = useRecoilValue(taskObjectSelector)
+    const setTaskCategories = useSetRecoilState(taskCategoriesListState)
+    
     const addNewCategory = () => {
-        console.log('adding new category', categoryNameRef.current?.value)
+        if (!categoryNameRef.current || categoryNameRef.current.value === '') return;
+            taskObject.addNewTaskCategory(categoryNameRef.current?.value || '')
+            .then((d) => { if (!d) return console.log('category not added') })
+            .then(() => { 
+                taskObject.getTaskCategories().then((data) => {
+                    console.log('data', data)
+                    setTaskCategories(data)
+                    // clear input
+                    categoryNameRef.current!.value = ''
+                })
+            })
     }
 
     return (

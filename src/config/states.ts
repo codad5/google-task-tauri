@@ -104,8 +104,6 @@ const taskObjectSelector = selector({
     key: 'taskObjectSelector',
     get: ({ get }) => {
         const taskObject = get(taskObjectState);
-        const accessToken = get(accessTokenState);
-        taskObject.setAccessToken(accessToken!);
         return taskObject;
     },
 });
