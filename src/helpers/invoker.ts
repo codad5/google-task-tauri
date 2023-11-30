@@ -2,11 +2,11 @@ import {invoke} from '@tauri-apps/api/tauri';
 import { AccessToken } from '../types/googleapis';
 
 export async function save_auth_code(code: string) {
-    return await invoke('save_auth_code', {code});
+    return await invoke('save_code', {code});
 }
 
 export async function get_auth_code() {
-    return await invoke('get_auth_code');
+    return await invoke('load_code');
 }
 
 export async function save_access_token(token: string|AccessToken) {

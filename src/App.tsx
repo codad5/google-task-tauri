@@ -50,7 +50,7 @@ function App() {
   useEffect(() => {
     listen_for_auth_code({
       onSucess: (code) => {
-        console.log(code);
+        console.log(code, "code generated");
         if (code) {
           saveAuthCode(code).then(() => {
             console.log("code saved");
