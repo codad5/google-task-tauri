@@ -3,10 +3,10 @@ import { UserProfile } from '../types/googleapis';
 import { Task } from '../helpers/task';
 import { task, taskCategory } from '../types/taskapi';
 
-const loggedInState = atom({
-    key: 'loggedInState',
-    default: false,
-});
+// const loggedInState = atom({
+//     key: 'loggedInState',
+//     default: false,
+// });
 
 const attemptLoginState = atom({
     key: 'attemptLoginState',
@@ -59,8 +59,8 @@ const messageState = atom<{ title: string, body?: string , type: "info" | "warni
 const loggedInSelector = selector({
     key: 'loggedInSelector',
     get: ({ get }) => {
-        const loggedIn = get(loggedInState);
-        return loggedIn;
+        const loggedIn = get(userProfileState);
+        return loggedIn && loggedIn.email != null && loggedIn.email != "";
     },
 });
 
@@ -84,7 +84,7 @@ const attemptLogoutSelector = selector({
 const userProfileSelector = selector({
     key: 'userSelector',
     get: ({ get }) => {
-        const loggedIn = get(loggedInState);
+        const loggedIn = get(loggedInSelector);
         const user = get(userProfileState);
         return loggedIn && user;
     },
@@ -141,8 +141,9 @@ const messageSelector = selector({
 });
 
 
+
 export {
-    loggedInState,
+    // loggedInState,
     userProfileState,
     loggedInSelector,
     userProfileSelector,

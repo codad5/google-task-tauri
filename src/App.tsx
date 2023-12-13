@@ -4,8 +4,8 @@ import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWi
 import { AccessToken, UserProfile } from "./types/googleapis";
 import { loadContextmenu , pushNotification } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, attemptLoginState, attemptLogoutState, loggedInState, messageState, userProfileState } from "./config/states";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, attemptLoginState, attemptLogoutState, loggedInSelector, messageState, userProfileState } from "./config/states";
 import Header from "./components/ui/Header";
 import { task } from "./types/taskapi";
 import { listen_for_auth_code } from "./helpers/eventlistner";
@@ -15,7 +15,7 @@ loadContextmenu();
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
-  const [loggedIn, setLoggedIn] = useRecoilState<boolean>(loggedInState);
+  const loggedIn = useRecoilValue(loggedInSelector);
   const setProfile = useSetRecoilState<UserProfile | null>(userProfileState);
   const setAccessToken = useSetRecoilState<string | null>(accessTokenState);
   const [attemptedLogin, setAttemptedLogin] = useRecoilState<boolean>(attemptLoginState);
@@ -87,7 +87,6 @@ function App() {
               if(!profile) throw new Error("Something went wrong, please try again");
               setProfile(profile);
               setAccessToken(accessToken.access_token);
-              setLoggedIn(true);
               setLoading(false)
               pushNotification(`welcome back ${profile.name}`)
             });
@@ -97,7 +96,6 @@ function App() {
               if (!profile) throw new Error("Signin required");
                 setProfile(profile);
                 setAccessToken(accessToken.access_token);
-                setLoggedIn(true);
                 pushNotification(`welcome back ${profile.name}`)
             });
           }
@@ -129,7 +127,6 @@ function App() {
       });
       console.log(userProfile);
       setProfile(userProfile);
-      setLoggedIn(true);
     }
     catch (err) {
       console.log(err);
@@ -148,7 +145,6 @@ function App() {
     setLoading(true)
     setAccessToken(null);
     setProfile(null);
-    setLoggedIn(false);
     setActiveTaskCategory(-1)
     setActiveCategoryTasksState([])
     await deleteAccessToken();
