@@ -4,8 +4,8 @@ import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWi
 import { AccessToken, UserProfile } from "./types/googleapis";
 import { loadContextmenu , pushNotification } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, attemptLoginState, attemptLogoutState, loggedInState, messageState, userProfileState } from "./config/states";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, attemptLoginState, attemptLogoutState, loggedInSelector, messageState, userProfileState } from "./config/states";
 import Header from "./components/ui/Header";
 import { task } from "./types/taskapi";
 import { listen_for_auth_code } from "./helpers/eventlistner";
@@ -15,7 +15,7 @@ loadContextmenu();
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
-  const [loggedIn, setLoggedIn] = useRecoilState<boolean>(loggedInState);
+  const loggedIn = useRecoilValue(loggedInSelector);
   const setProfile = useSetRecoilState<UserProfile | null>(userProfileState);
   const setAccessToken = useSetRecoilState<string | null>(accessTokenState);
   const [attemptedLogin, setAttemptedLogin] = useRecoilState<boolean>(attemptLoginState);
@@ -43,6 +43,20 @@ function App() {
     }
   }, [toastMessage])
 
+
+  useEffect(() => {
+    if (attemptedLogin) {
+      handleLogin();
+      setAttemptedLogin(false);
+    }
+  }, [attemptedLogin])
+
+  useEffect(() => {
+    if (attemptedLogout) {
+      handleLogout();
+      setAttemptedLogout(false);
+    }
+  }, [attemptedLogout])
 
   
 
@@ -76,60 +90,40 @@ function App() {
   // check the offline data for access token
   useEffect(() => {
     setLoading(true)
-    // get access token from storage
-    getAccessTokenFromStorage().then((accessToken) => {
-      try {
-        if (!accessToken) throw new Error("Signin required");
-          pushNotification("Login Successful")
-          if (navigator.onLine) {
-            // fetch user profile
-            fetchUserProfile(accessToken.access_token).then((profile) => {
-              if(!profile) throw new Error("Something went wrong, please try again");
-              setProfile(profile);
-              setAccessToken(accessToken.access_token);
-              setLoggedIn(true);
-              setLoading(false)
-              pushNotification(`welcome back ${profile.name}`)
-            });
-          }
-          else {
-            getUserProfileFromStorage().then((profile) => {
-              if (!profile) throw new Error("Signin required");
-                setProfile(profile);
-                setAccessToken(accessToken.access_token);
-                setLoggedIn(true);
-                pushNotification(`welcome back ${profile.name}`)
-            });
-          }
-      }catch (err) {
-          console.log(err);
-          setLoading(false)
-          setToastMessage({
-            title: "Error",
-            body: "Error signing in",
-            type: "error"
-          })
-        }
+    handleInitialLogin ().catch((err) => {
+        console.log(err); 
+        setLoading(false)
+        setToastMessage({
+          title: "Error",
+          body: "Error signing in",
+          type: "error"
+        })
     }).finally(() => {
       setLoading(false)
     })
   }, [])
 
 
+  async function handleInitialLogin() {
+    // get access token from storage
+    const accessToken = await getAccessTokenFromStorage();
+    if (!accessToken) throw new Error("Signin required");
+    pushNotification("Login Successful")
+    const profile = navigator.onLine ? await fetchUserProfile(accessToken.access_token) : await getUserProfileFromStorage();
+    if(!profile) throw new Error("Something went wrong, please try again");
+    setProfile(profile);
+    setAccessToken(accessToken.access_token);
+    pushNotification(`welcome back ${profile.name}`)
+  }
+
 
   async function handleLoadFrom(accessTokenBody: AccessToken) {
     try {
-      saveAccessToken(JSON.stringify(accessTokenBody, null, 2)).then(() => {
-        console.log("access token saved");
-      });
+      await saveAccessToken(JSON.stringify(accessTokenBody, null, 2))
       setAccessToken(accessTokenBody.access_token);
       const userProfile = await fetchUserProfile(accessTokenBody.access_token);
-      saveUserProfile(userProfile).then(() => {
-        console.log("user profile saved");
-      });
-      console.log(userProfile);
+      await saveUserProfile(userProfile)
       setProfile(userProfile);
-      setLoggedIn(true);
     }
     catch (err) {
       console.log(err);
@@ -142,32 +136,21 @@ function App() {
       })
     }
   }
+
+ 
  
 
   async function handleLogout() {
     setLoading(true)
     setAccessToken(null);
     setProfile(null);
-    setLoggedIn(false);
     setActiveTaskCategory(-1)
     setActiveCategoryTasksState([])
     await deleteAccessToken();
     setLoading(false)
   }
 
-  useEffect(() => {
-    if (attemptedLogin) {
-      handleLogin();
-      setAttemptedLogin(false);
-    }
-  }, [attemptedLogin])
-
-  useEffect(() => {
-    if (attemptedLogout) {
-      handleLogout();
-      setAttemptedLogout(false);
-    }
-  }, [attemptedLogout])
+  
 
   
 
