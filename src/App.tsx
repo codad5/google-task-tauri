@@ -44,6 +44,20 @@ function App() {
   }, [toastMessage])
 
 
+  useEffect(() => {
+    if (attemptedLogin) {
+      handleLogin();
+      setAttemptedLogin(false);
+    }
+  }, [attemptedLogin])
+
+  useEffect(() => {
+    if (attemptedLogout) {
+      handleLogout();
+      setAttemptedLogout(false);
+    }
+  }, [attemptedLogout])
+
   
 
   // to generate a port and listen to it
@@ -76,56 +90,39 @@ function App() {
   // check the offline data for access token
   useEffect(() => {
     setLoading(true)
-    // get access token from storage
-    getAccessTokenFromStorage().then((accessToken) => {
-      try {
-        if (!accessToken) throw new Error("Signin required");
-          pushNotification("Login Successful")
-          if (navigator.onLine) {
-            // fetch user profile
-            fetchUserProfile(accessToken.access_token).then((profile) => {
-              if(!profile) throw new Error("Something went wrong, please try again");
-              setProfile(profile);
-              setAccessToken(accessToken.access_token);
-              setLoading(false)
-              pushNotification(`welcome back ${profile.name}`)
-            });
-          }
-          else {
-            getUserProfileFromStorage().then((profile) => {
-              if (!profile) throw new Error("Signin required");
-                setProfile(profile);
-                setAccessToken(accessToken.access_token);
-                pushNotification(`welcome back ${profile.name}`)
-            });
-          }
-      }catch (err) {
-          console.log(err);
-          setLoading(false)
-          setToastMessage({
-            title: "Error",
-            body: "Error signing in",
-            type: "error"
-          })
-        }
+    handleInitialLogin ().catch((err) => {
+        console.log(err); 
+        setLoading(false)
+        setToastMessage({
+          title: "Error",
+          body: "Error signing in",
+          type: "error"
+        })
     }).finally(() => {
       setLoading(false)
     })
   }, [])
 
 
+  async function handleInitialLogin() {
+    // get access token from storage
+    const accessToken = await getAccessTokenFromStorage();
+    if (!accessToken) throw new Error("Signin required");
+    pushNotification("Login Successful")
+    const profile = navigator.onLine ? await fetchUserProfile(accessToken.access_token) : await getUserProfileFromStorage();
+    if(!profile) throw new Error("Something went wrong, please try again");
+    setProfile(profile);
+    setAccessToken(accessToken.access_token);
+    pushNotification(`welcome back ${profile.name}`)
+  }
+
 
   async function handleLoadFrom(accessTokenBody: AccessToken) {
     try {
-      saveAccessToken(JSON.stringify(accessTokenBody, null, 2)).then(() => {
-        console.log("access token saved");
-      });
+      await saveAccessToken(JSON.stringify(accessTokenBody, null, 2))
       setAccessToken(accessTokenBody.access_token);
       const userProfile = await fetchUserProfile(accessTokenBody.access_token);
-      saveUserProfile(userProfile).then(() => {
-        console.log("user profile saved");
-      });
-      console.log(userProfile);
+      await saveUserProfile(userProfile)
       setProfile(userProfile);
     }
     catch (err) {
@@ -139,6 +136,8 @@ function App() {
       })
     }
   }
+
+ 
  
 
   async function handleLogout() {
@@ -151,19 +150,7 @@ function App() {
     setLoading(false)
   }
 
-  useEffect(() => {
-    if (attemptedLogin) {
-      handleLogin();
-      setAttemptedLogin(false);
-    }
-  }, [attemptedLogin])
-
-  useEffect(() => {
-    if (attemptedLogout) {
-      handleLogout();
-      setAttemptedLogout(false);
-    }
-  }, [attemptedLogout])
+  
 
   
 
