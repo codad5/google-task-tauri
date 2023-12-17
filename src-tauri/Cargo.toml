@@ -22,7 +22,8 @@ borsh = { version = "1.2.0", features = ["std", "borsh-derive", "derive", "bson"
 cocoon = "0.4.1"
 tauri-plugin-oauth = { git = "https://github.com/FabianLars/tauri-plugin-oauth", branch = "main" }
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
-tauri-plugin-context-menu = { version = "0.6.1" }
+tauri-plugin-context-menu = "0.6.1"
+tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 dotenv = "0.15.0"
 lazy_static = "1.4.0"
 

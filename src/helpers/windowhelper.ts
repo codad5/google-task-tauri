@@ -8,7 +8,6 @@ export function loadContextmenu() {
   }
   window.addEventListener("contextmenu", (e) => {
     e.preventDefault()
-    pushNotification("Click Context")
     showMenu({
       items: [
         {
