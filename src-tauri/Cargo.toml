@@ -27,6 +27,8 @@ tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-wo
 dotenv = "0.15.0"
 lazy_static = "1.4.0"
 strum = { version = "0.25.0", features = ["strum_macros"] }
+specta = "1.0.5"
+tauri-specta = { version = "1.0.2", features = ["javascript", "typescript"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

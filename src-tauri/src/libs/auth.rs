@@ -10,7 +10,7 @@ use borsh::{BorshDeserialize, to_vec};
 
 
 
-#[derive(borsh::BorshDeserialize, borsh::BorshSerialize, Debug, serde::Serialize, serde::Deserialize, Clone)]
+#[derive(borsh::BorshDeserialize, borsh::BorshSerialize, Debug, serde::Serialize, serde::Deserialize, Clone, specta::Type)]
 pub struct AccessToken {
     access_token: String,
     expires_in: i32,
@@ -64,7 +64,7 @@ impl AccessToken {
 pub struct Auth;
 
 impl Auth {
-    pub fn save_auth_code(code: String) -> String {
+    pub fn save_auth_code(code: String) -> SaveTokenResponse {
         let encoded = to_vec(&code).unwrap();
         let password: String = env::var("DB_PASSWORD").unwrap();
         let mut cocoon = Cocoon::new(password.as_bytes());
@@ -79,7 +79,7 @@ impl Auth {
             success: true,
             token: code,
         };
-        serde_json::to_string(&response).expect("JSON serialization error")
+        return response;
     }
 
     pub fn load_auth_code() -> String {
@@ -95,18 +95,15 @@ impl Auth {
         };
     }
 
-    pub fn save_access_token(token: String) -> String {
+    pub fn save_access_token(token: String) -> SaveAccessTokenResponse {
         let content : AccessToken = serde_json::from_str(&token).unwrap();
         let response : SaveAccessTokenResponse = content.save();
-        // Serialize the response object to JSON and return as a string
-        serde_json::to_string(&response).expect("JSON serialization error")
+        return response;
     }
 
-    pub fn load_access_token() -> String {
+    pub fn load_access_token() -> AccessToken {
         let response : AccessToken = AccessToken::load();
-        println!("response: {:?}", response);
-        // Serialize the response object to JSON and return as a string
-        serde_json::to_string(&response).expect("JSON serialization error")
+        return response;
     }
 }
 

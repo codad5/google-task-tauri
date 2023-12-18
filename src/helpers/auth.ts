@@ -1,10 +1,11 @@
 import { shell } from "@tauri-apps/api";
 import axios from "axios";
-import { AccessToken, UserProfile } from "../types/googleapis";
+import { UserProfile } from "../types/googleapis";
 import { readTextFile, removeFile, writeTextFile, exists } from "@tauri-apps/api/fs";
 import { CLIENT_ID, CLIENT_SECRET } from "../config/credentials";
 import settings from "../config/settings";
 import { generate_oauth_port, get_access_token, get_auth_code, save_access_token, save_auth_code } from "./invoker";
+import { AccessToken } from "./commands";
 
 
 const DEFAULT_DIRECTORY = settings.fs.DEFAULT_DIRECTORY;
@@ -159,13 +160,12 @@ export async function getAccessTokenFromStorage() {
     try {
         // if file does not exist, return null
         if(! await exists(STORAGE_PATHS.access_token, { dir: DEFAULT_DIRECTORY })) throw new Error("File does not exist");
-        const accessTokenText: string = (await get_access_token()) as string;
+        let accessToken = await get_access_token();
         console.log('new access token found')
-        let accessToken = JSON.parse(accessTokenText) as AccessToken;
         // check if the access token is expired
         console.log(accessToken, "accessToken");
         const lastLogin = parseInt(localStorage.getItem("lastLogin") || "0");
-        if ((accessToken.expiry_in < Date.now() || Date.now() - lastLogin > 3620) && navigator.onLine){
+        if ((accessToken.expires_in < Date.now() || Date.now() - lastLogin > 3620) && navigator.onLine){
             console.log("Access token expired");
             accessToken = await refreshAndSaveAccessToken(accessToken.refresh_token);
         }

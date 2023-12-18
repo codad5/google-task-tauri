@@ -1,7 +1,7 @@
 import { useState , useEffect} from "react";
 import { Box, Button, Spinner, useToast  } from '@chakra-ui/react'
 import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken } from "./helpers/auth";
-import { AccessToken, UserProfile } from "./types/googleapis";
+import { UserProfile } from "./types/googleapis";
 import { loadContextmenu , pushNotification } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -10,6 +10,7 @@ import Header from "./components/ui/Header";
 import { task } from "./types/taskapi";
 import { listen_for_auth_code } from "./helpers/eventlistner";
 import { test_command } from "./helpers/invoker";
+import { AccessToken } from "./helpers/commands";
 
 // disable default context menu on build
 loadContextmenu();
@@ -114,7 +115,7 @@ function App() {
     if (!accessToken) throw new Error("Signin required");
     pushNotification("Login Successful")
     const profile = navigator.onLine ? await fetchUserProfile(accessToken.access_token) : await getUserProfileFromStorage();
-    if(!profile) throw new Error("Something went wrong, please try again");
+    if(!profile || !profile?.email) throw new Error("Something went wrong, please try again");
     setProfile(profile);
     setAccessToken(accessToken.access_token);
     pushNotification(`welcome back ${profile.name}`)
