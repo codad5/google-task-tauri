@@ -1,5 +1,5 @@
 import { Options, isPermissionGranted, requestPermission, sendNotification } from "@tauri-apps/api/notification";
-import {showMenu} from "tauri-plugin-context-menu";
+import { showMenu } from "tauri-plugin-context-menu";
 
 // Disable the right-click menu and text selection.
 export function loadContextmenu() {
@@ -8,7 +8,6 @@ export function loadContextmenu() {
   }
   window.addEventListener("contextmenu", (e) => {
     e.preventDefault()
-    pushNotification("Click Context")
     showMenu({
       items: [
         {
@@ -37,4 +36,5 @@ export function pushNotification(options: string | Options) {
         sendNotification(options);
     });
 }
+
 

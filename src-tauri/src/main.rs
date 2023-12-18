@@ -4,29 +4,55 @@
 mod libs;
 
 use tauri_plugin_log::{LogTarget};
+use specta::collect_types;
+use tauri_specta::{ts, js};
+
+
 use libs::tauri_actions::{save_access_token,load_access_token, greet, test_command, save_code, load_code};
 use libs::filehelper::{ENV_FILE, initialize_user_files};
 
 
-fn main() {
-    dotenv::from_filename(ENV_FILE).ok();
-    initialize_user_files();
-    tauri::Builder::default()
-        .plugin(tauri_plugin_context_menu::init())
-        .plugin(tauri_plugin_oauth::init())
-        .plugin(tauri_plugin_log::Builder::default().targets([
-            LogTarget::LogDir,
-            LogTarget::Stdout,
-            LogTarget::Webview,
-        ]).build())
-        .invoke_handler(tauri::generate_handler![
+fn run_specta() {
+
+    println!("Running specta to generate typescript bindings");
+
+     #[cfg(debug_assertions)]
+    ts::export(collect_types![
             save_access_token,
             load_access_token,
             greet,
             test_command,
             save_code,
             load_code,
-        ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+    ], "../src/helpers/commands.ts").unwrap();
+}
+
+fn main() {
+    dotenv::from_filename(ENV_FILE).ok();
+    initialize_user_files();
+    run_specta();
+
+    tauri::Builder::default()
+    .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+        println!("{}, {argv:?}, {cwd}", app.package_info().name);
+        // app.emit_all("single-instance", Payload { args: argv, cwd }).unwrap();
+    }))
+    .plugin(tauri_plugin_context_menu::init())
+    .plugin(tauri_plugin_oauth::init())
+    .plugin(tauri_plugin_log::Builder::default().targets([
+        LogTarget::LogDir,
+        LogTarget::Stdout,
+        LogTarget::Webview,
+    ])
+    .build())
+    .invoke_handler(tauri::generate_handler![
+        save_access_token,
+        load_access_token,
+        greet,
+        test_command,
+        save_code,
+        load_code,
+    ])
+    .run(tauri::generate_context!())
+    .expect("error while running tauri application");
 }

@@ -4,14 +4,6 @@ export interface UserProfile {
   name: string | null; // User's name
 }
 
-export interface AccessToken {
-  access_token: string;
-  refresh_token: string;
-  scope: string;
-  token_type: string;
-  expiry_in: number;
-  id_token: string;
-}
 
 export type GoogleServices = 'tasks' | 'oauth2' 
 

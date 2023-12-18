@@ -1,7 +1,8 @@
 import { readTextFile } from "@tauri-apps/api/fs";
 import settings from "../config/settings";
-import { AccessToken, GoogleServices } from "../types/googleapis";
+import {GoogleServices } from "../types/googleapis";
 import axios, { AxiosInstance } from "axios";
+import { AccessToken } from "./commands";
 
 
 const STORAGE_PATHS = settings.storage.paths;
