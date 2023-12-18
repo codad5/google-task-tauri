@@ -26,6 +26,7 @@ tauri-plugin-context-menu = "0.6.1"
 tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 dotenv = "0.15.0"
 lazy_static = "1.4.0"
+strum = { version = "0.25.0", features = ["strum_macros"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

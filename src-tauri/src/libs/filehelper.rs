@@ -6,9 +6,8 @@ use tauri::Env;
 
 pub const ENV_FILE: &str = "../.env.local";
 
+
 pub const USERS_FILES: [&str; 4] = ["access_token.db", "auth_code.db", "tasks.json", "user_profile.json"];
-
-
 
 
 pub fn initialize_user_files() {
@@ -32,7 +31,7 @@ pub fn get_app_local_data_dir(file_name: &str) -> String {
     let path = path.to_str().unwrap().to_string();
     println!("path: {} \n file name: {} \n", path, file_name);
     // check if file exists
-    if !std::path::Path::new(file_name).exists() {
+    if !std::path::Path::new(&path).exists() {
         println!("File does not exist, creating file {} for {}", file_name, path);
         // create file
         let mut file = std::fs::File::create(&path).unwrap();

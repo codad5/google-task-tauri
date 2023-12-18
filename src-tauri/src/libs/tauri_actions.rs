@@ -1,3 +1,5 @@
+use std::env;
+
 use tauri;
 
 // super mod imports;
@@ -15,7 +17,7 @@ struct GreetResponse {
 pub fn test_command() -> String {
     println!("access token path: {}", &*ACCESS_TOKEN_FILE);
     println!("ENV_FILE: {}", ENV_FILE);
-    return "ACCESS_TOKEN_FILE".to_string() 
+    return env::var("DB_PASSWORD").unwrap();
 }
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command

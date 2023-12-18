@@ -19,7 +19,7 @@ export async function get_access_token() {
 }
 
 export async function test_command() {
-    return await invoke('test_command');
+    return await invoke<string>('test_command');
 }
 
 export async function greet(name: string) {

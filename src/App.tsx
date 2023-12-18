@@ -9,9 +9,13 @@ import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, at
 import Header from "./components/ui/Header";
 import { task } from "./types/taskapi";
 import { listen_for_auth_code } from "./helpers/eventlistner";
+import { test_command } from "./helpers/invoker";
 
 // disable default context menu on build
 loadContextmenu();
+
+// to check / test db password
+test_command().then(d => pushNotification(d));
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
