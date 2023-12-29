@@ -6,6 +6,7 @@ mod libs;
 use tauri_plugin_log::{LogTarget};
 use specta::collect_types;
 use tauri_specta::{ts, js};
+use std::env;
 
 
 use libs::tauri_actions::{save_access_token,load_access_token, greet, test_command, save_code, load_code};
