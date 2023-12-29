@@ -15,7 +15,6 @@ use libs::filehelper::{ENV_FILE, initialize_user_files};
 fn run_specta() {
 
     println!("Running specta to generate typescript bindings");
-
      #[cfg(debug_assertions)]
     ts::export(collect_types![
             save_access_token,
@@ -29,6 +28,13 @@ fn run_specta() {
 
 fn main() {
     dotenv::from_filename(ENV_FILE).ok();
+
+    // set default DB_PASSWORD env variable if not set
+    // this is setting is for now till we have a better way to handle this env variable on build
+    if env::var("DB_PASSWORD").is_err() {
+        env::set_var("DB_PASSWORD", "password");
+    }
+
     initialize_user_files();
     run_specta();
 
