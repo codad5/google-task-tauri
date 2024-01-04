@@ -1,7 +1,7 @@
 export type OperationSystem = "windows" | "mac" | "linux" | "other" | "darwin"  
 
 export type PlatformData = {
-    platform: string;
+    platform: OperationSystem;
     url: string;
     version: string;
     date: string;
@@ -26,3 +26,13 @@ export type githubLatestReleaseData = {
     tag: string;
     draft: boolean;
 };
+
+export type postsType = {
+    slug: string,
+    title: string,
+    date: string,
+    description: string,
+    tags: string|string[]
+    image?: string,
+    published?: boolean
+}
