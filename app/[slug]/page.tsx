@@ -10,7 +10,7 @@ import { Metadata } from 'next';
 
 
 export const generateStaticParams = () => {
-    const posts = getPostsAndMetadata('static-pages')
+    const posts = getPostsAndMetadata('./static-pages')
     console.log(posts)
     return posts.map((post) => ({
             slug: post.slug 
@@ -19,7 +19,7 @@ export const generateStaticParams = () => {
 
 export async function generateMetadata({ params, searchParams }: { params: { slug: string }, searchParams: any }): Promise<Metadata> {
     const { slug } = params;
-    const postContents = getPostMetadata(slug, 'static-pages')
+    const postContents = getPostMetadata(slug, './static-pages')
     if(!postContents) return {};
     const { title, date, description, tags, image } = postContents
     return {
@@ -56,7 +56,7 @@ export async function generateMetadata({ params, searchParams }: { params: { slu
 export default function StaticPage({ params }: { params: { slug: string } }) {
     const { slug } = params;
     console.log(slug, 'slug')
-    const postContents = getPostContent(slug, 'static-pages')
+    const postContents = getPostContent(slug, './static-pages')
     if(!postContents) notFound()
     const { content, data } = matter(postContents);
     const { title, date, image , tags, description} = data as postsType
