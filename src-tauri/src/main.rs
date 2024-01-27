@@ -14,9 +14,9 @@ use libs::filehelper::{ENV_FILE, initialize_user_files};
 
 
 fn run_specta() {
-
     println!("Running specta to generate typescript bindings");
-     #[cfg(debug_assertions)]
+
+    #[cfg(debug_assertions)]
     ts::export(collect_types![
             save_access_token,
             load_access_token,
@@ -24,7 +24,7 @@ fn run_specta() {
             test_command,
             save_code,
             load_code,
-    ], "../src/helpers/commands.ts").unwrap();
+    ], "../src/helpers/commands.ts").expect("Failed to export typescript bindings");
 }
 
 fn main() {

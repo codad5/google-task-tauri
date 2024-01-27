@@ -15,9 +15,6 @@ import { AccessToken } from "./helpers/commands";
 // disable default context menu on build
 loadContextmenu();
 
-// to check / test db password
-test_command().then(d => pushNotification(d));
-
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const loggedIn = useRecoilValue(loggedInSelector);
