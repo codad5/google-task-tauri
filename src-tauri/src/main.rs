@@ -41,10 +41,11 @@ fn main() {
 
     tauri::Builder::default()
     .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
-        println!("{}, {argv:?}, {cwd}", app.package_info().name);
+        println!("from single instance {}, {argv:?}, {cwd}", app.package_info().name);
         // app.emit_all("single-instance", Payload { args: argv, cwd }).unwrap();
     }))
     .plugin(tauri_plugin_context_menu::init())
+    .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_oauth::init())
     .plugin(tauri_plugin_log::Builder::default().targets([
         LogTarget::LogDir,
