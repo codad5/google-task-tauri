@@ -14,6 +14,7 @@ export default function TaskItem({ task }: { task: task }) {
     const setActiveCategoryTasks = useSetRecoilState(activeCategoryTasksState)
     const setToastMessage = useSetRecoilState(messageState)
     const [deleteIsClicked, setDeleteIsClicked] = useState(false)
+    
 
 
     const handleTaskCheck = (task: task) => {
@@ -34,7 +35,7 @@ export default function TaskItem({ task }: { task: task }) {
     const handleTaskDelete = (task: task) => {
         setDeleteIsClicked(true)
         Taskobject.deleteTask(task, taskCategoryList[activeTaskCategory].id).then((d) => {
-            if(!d) return  console.log('task deleted')
+            if(d == null) throw new Error("Task not deleted")
             Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
                 setActiveCategoryTasks(active => {
                     return active.filter((t) => {
@@ -42,8 +43,19 @@ export default function TaskItem({ task }: { task: task }) {
                     })
                 })
             })
-        }).finally(() => {
+        }).then(() => {
             Taskobject.clearPositionCache(activeTaskCategory)
+            setToastMessage({
+                title: "Task Deleted",
+                type : "warning",
+            })
+        }).catch((err) => {
+            setToastMessage({
+                title: "Error",
+                body:(err as Error).message,
+                type : "warning",
+            })
+        }).finally(() => {
             setDeleteIsClicked(false)
         })
     }

@@ -1,11 +1,11 @@
 import { useRecoilValue } from "recoil"
-import { activeCategoryTasksSelector } from "../../config/states"
+import { activeCategoryTasksSelector, activeCategoryTasksState } from "../../config/states"
 import { task } from "../../types/taskapi"
 import TaskItem from "./TaskItem"
 import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Center } from "@chakra-ui/react"
 
 export default function TaskList() {
-    const activeCategoryTasks = useRecoilValue<task[]>(activeCategoryTasksSelector)
+    const activeCategoryTasks = useRecoilValue<task[]>(activeCategoryTasksState)
 
     const unCompletedTasks = activeCategoryTasks.filter(task => !task.completed)
     const CompletedTasks = activeCategoryTasks.filter(task => task.completed)
