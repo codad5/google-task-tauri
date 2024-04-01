@@ -1,15 +1,12 @@
-import { useState , useEffect} from "react";
+import { useEffect} from "react";
 import { Box, Button, Spinner, useToast  } from '@chakra-ui/react'
-import { fetchUserProfile,getUserProfileFromStorage,  getAccessToken, openAuthWindow, saveAccessToken, saveAuthCode, saveUserProfile, getAccessTokenFromStorage, deleteAccessToken, handleInitialLogin, handleLoadFrom, handleLogin, handleLogout } from "./helpers/auth";
-import { UserProfile } from "./types/googleapis";
-import { loadContextmenu , pushNotification } from "./helpers/windowhelper";
+import { getAccessToken, saveAuthCode, handleInitialLogin, handleLoadFrom, handleLogin, handleLogout } from "./helpers/auth";
+import { loadContextmenu } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, attemptLoginState, attemptLogoutState, authLoadingState, loggedInSelector, messageState, userProfileState } from "./config/states";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { attemptLoginState, attemptLogoutState, authLoadingState, loggedInSelector, messageState } from "./config/states";
 import Header from "./components/ui/Header";
-import { task } from "./types/taskapi";
 import { listen_for_auth_code } from "./helpers/eventlistner";
-import { AccessToken } from "./helpers/commands";
 
 // disable default context menu on build
 loadContextmenu();
@@ -17,12 +14,8 @@ loadContextmenu();
 function App() {
   const [loading, setLoading] = useRecoilState<boolean>(authLoadingState);
   const loggedIn = useRecoilValue(loggedInSelector);
-  const setProfile = useSetRecoilState<UserProfile | null>(userProfileState);
-  const setAccessToken = useSetRecoilState<string | null>(accessTokenState);
   const [attemptedLogin, setAttemptedLogin] = useRecoilState<boolean>(attemptLoginState);
   const [attemptedLogout, setAttemptedLogout] = useRecoilState<boolean>(attemptLogoutState);
-  const setActiveTaskCategory = useSetRecoilState<number>(activeTaskCategoryState);
-  const setActiveCategoryTasksState = useSetRecoilState<task[]>(activeCategoryTasksState);
   const [toastMessage, setToastMessage] = useRecoilState(messageState)
 
   // error message toast
