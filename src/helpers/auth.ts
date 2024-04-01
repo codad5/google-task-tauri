@@ -6,6 +6,9 @@ import { CLIENT_ID, CLIENT_SECRET } from "../config/credentials";
 import settings from "../config/settings";
 import { generate_oauth_port, get_access_token, get_auth_code, save_access_token, save_auth_code } from "./invoker";
 import { AccessToken } from "./commands";
+import { getRecoil, setRecoil } from "recoil-nexus";
+import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, authLoadingState, messageState, userProfileState } from "../config/states";
+import { pushNotification } from "./windowhelper";
 
 
 const DEFAULT_DIRECTORY = settings.fs.DEFAULT_DIRECTORY;
@@ -205,6 +208,79 @@ export async function getUserProfileFromStorage() {
     }
 }
 
+
+export async function handleLogin() {
+    setRecoil(authLoadingState, true)
+    try {
+      const storedAccessToken = await getAccessTokenFromStorage();
+      if (storedAccessToken) {
+        handleLoadFrom(storedAccessToken);
+        pushNotification('Login Successful')
+        return;
+      }
+      pushNotification('login required')
+      await openAuthWindow();
+    } catch (error) {
+      console.log(error);
+      setRecoil(authLoadingState, false)
+      setRecoil(messageState, {
+        title: "Error",
+        body: "Error signing in",
+        type: "error"
+      })
+    }
+}
+  
+
+export async function handleLoadFrom(accessTokenBody: AccessToken) {
+    try {
+      await saveAccessToken(JSON.stringify(accessTokenBody, null, 2))
+      setRecoil(accessTokenState, accessTokenBody.access_token);
+        //   setAccessToken(accessTokenBody.access_token);
+      const userProfile = await fetchUserProfile(accessTokenBody.access_token);
+      await saveUserProfile(userProfile)
+      setRecoil(userProfileState, userProfile);
+    }
+    catch (err) {
+      console.log(err);
+      setRecoil(authLoadingState, false)
+      await handleLogout();
+      setRecoil(messageState, {
+        title: "Error",
+        body: "Error signing in",
+        type: "error"
+      })
+    }
+}
+  
+export async function handleLogout() {
+    setRecoil(authLoadingState, true)
+    setRecoil(accessTokenState, null);
+    // setAccessToken(null);
+    setRecoil(userProfileState, null);
+    // setProfile(null);
+    // setActiveTaskCategory(-1)
+    setRecoil(activeTaskCategoryState, -1)
+    // setActiveCategoryTasksState([])
+    setRecoil(activeCategoryTasksState, [])
+    await deleteAccessToken();
+    setRecoil(authLoadingState, false)
+  }
+
+
+export async function handleInitialLogin() {
+    // get access token from storage
+    const accessToken = await getAccessTokenFromStorage();
+    if (!accessToken) throw new Error("Signin required");
+    pushNotification("Login Successful")
+    const profile = navigator.onLine ? await fetchUserProfile(accessToken.access_token) : await getUserProfileFromStorage();
+    if(!profile || !profile?.email) throw new Error("Something went wrong, please try again");
+    // setProfile(profile);
+    setRecoil(userProfileState, profile);
+    // setAccessToken(accessToken.access_token);
+    setRecoil(accessTokenState, accessToken.access_token);
+    pushNotification(`welcome back ${profile.name}`)
+  }
 
 
 

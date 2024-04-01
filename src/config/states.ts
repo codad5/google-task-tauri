@@ -53,7 +53,19 @@ const messageState = atom<{ title: string, body?: string , type: "info" | "warni
     default: null,
 });
     
+const authLoadingState = atom<boolean>({
+    key: 'authLoading',
+    default: false,
+});
 
+
+const authLoadingSelector = selector({
+    key: 'authLoadingSelector',
+    get: ({ get }) => {
+        const loading = get(authLoadingState);
+        return loading;
+    },
+});
 
 
 const loggedInSelector = selector({
@@ -163,4 +175,6 @@ export {
     attemptLogoutSelector,
     messageState,
     messageSelector,
+    authLoadingState, 
+    authLoadingSelector
 };

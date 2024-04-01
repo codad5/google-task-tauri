@@ -22,6 +22,9 @@ export function loadContextmenu() {
   }, { capture: true })
 }
 
+
+//  TODO: Remove the counter 
+let notificationCount = 0;
 export function pushNotification(options: string | Options) {
     isPermissionGranted().then((granted) => {
         if (!granted) {
@@ -32,8 +35,11 @@ export function pushNotification(options: string | Options) {
                 }
             });
         }
-        console.log("permission granted");
-        sendNotification(options);
+      console.log("permission granted");
+      if (typeof options === 'object') options.body = `${options.body} ${notificationCount}`;
+      if (typeof options === 'string') options = `${options} ${notificationCount}`;
+      sendNotification(options);
+      notificationCount++;
     });
 }
 
