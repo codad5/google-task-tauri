@@ -2,7 +2,7 @@ import { useState , useEffect} from "react";
 import { Tabs, TabPanels, Box, Spinner} from '@chakra-ui/react'
 import { taskCategory, task } from "../types/taskapi";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { accessTokenSelector, activeCategoryTasksState, activeTaskCategoryState, taskObjectState, taskCategoriesListState, messageState } from "../config/states";
+import { accessTokenSelector, activeCategoryTasksState, activeTaskCategoryState, taskObjectState, taskCategoriesListState, messageState, isOnlineSelector } from "../config/states";
 import { Task } from "../helpers/task";
 import TaskList from "./ui/TaskList";
 import AddTaskForm from "./ui/AddTaskForm";
@@ -22,6 +22,7 @@ export default function TaskPage() {
   const setActiveCategoryTasks = useSetRecoilState<task[]>(activeCategoryTasksState)
   const [loading, setloading] = useState(true)
   const [toastMessage, setToastMessage] = useRecoilState(messageState)
+  const isOnline = useRecoilValue(isOnlineSelector)
   
   useEffect(() => {
     console.log('before task object', Taskobject, access_token)
@@ -50,13 +51,14 @@ export default function TaskPage() {
   }, [Taskobject])
 
   useEffect(() => {
+    console.log('a active task or online changed', navigator.onLine)
     setloading(true)
     if (activeTaskCategory < 0) return;
     Taskobject.getTasksByCategoryPosition(activeTaskCategory).then((data) => {
       setActiveCategoryTasks(data)
       setloading(false)
     })
-  }, [activeTaskCategory])
+  }, [activeTaskCategory, isOnline])
 
 
   return (

@@ -161,8 +161,6 @@ export async function saveAccessToken(accessToken: string|AccessToken) {
 
 export async function getAccessTokenFromStorage() {
     try {
-        // if file does not exist, return null
-        if(! await exists(STORAGE_PATHS.access_token, { dir: DEFAULT_DIRECTORY })) throw new Error("File does not exist");
         let accessToken = await get_access_token();
         console.log('new access token found')
         // check if the access token is expired

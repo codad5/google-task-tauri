@@ -194,7 +194,7 @@ export class Task {
             if (!tasks) tasks = []
             this.tasksCategoryList.set(tasks.map((taskCategory) => {
                 // if category with same id exists, merge them
-                const existingCategory = this.tasksCategoryList.get()?.find((category) => category.id === taskCategory.id);
+                const existingCategory = this.tasksCategoryList.get()?.find((category) => category?.id === taskCategory?.id);
                 if (existingCategory) {
                     taskCategory.tasks = [...existingCategory.tasks || [], ...taskCategory.tasks || []];
                 }

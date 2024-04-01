@@ -3,8 +3,8 @@ import { Box, Button, Spinner, useToast  } from '@chakra-ui/react'
 import { getAccessToken, saveAuthCode, handleInitialLogin, handleLoadFrom, handleLogin, handleLogout } from "./helpers/auth";
 import { loadContextmenu } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { attemptLoginState, attemptLogoutState, authLoadingState, loggedInSelector, messageState } from "./config/states";
+import { useRecoilRefresher_UNSTABLE, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { attemptLoginState, attemptLogoutState, authLoadingState, isOnlineSelector, loggedInSelector, messageState } from "./config/states";
 import Header from "./components/ui/Header";
 import { listen_for_auth_code } from "./helpers/eventlistner";
 
@@ -17,6 +17,8 @@ function App() {
   const [attemptedLogin, setAttemptedLogin] = useRecoilState<boolean>(attemptLoginState);
   const [attemptedLogout, setAttemptedLogout] = useRecoilState<boolean>(attemptLogoutState);
   const [toastMessage, setToastMessage] = useRecoilState(messageState)
+  const setIsOnline = useSetRecoilState(isOnlineSelector)
+  const refreshIsOnline = () => setIsOnline(() => navigator.onLine)
 
   // error message toast
   const toast = useToast()
@@ -24,6 +26,7 @@ function App() {
 
   useEffect(() => {
     if (toastMessage) {
+      toast.closeAll()
       toast({
         title: toastMessage.title,
         description: toastMessage.body,
@@ -96,6 +99,27 @@ function App() {
       setLoading(false)
     })
   }, [])
+
+
+  // updating the isonline value every 5 mins
+  window.addEventListener('online', () => {
+    setToastMessage({
+      title: "Network Changed",
+      body: "Internet restored",
+      type : "success",
+    })
+    refreshIsOnline()
+  })
+
+  window.addEventListener('offline', () => {
+    setToastMessage({
+      title: "Network Changed",
+      body: "No internet",
+      type : "error",
+    })
+    refreshIsOnline()
+  })
+
 
 
 

@@ -58,6 +58,7 @@ const AddTaskForm = () => {
                     setActiveCategoryTasks(data)
                 }).finally(() => {
                     console.log('done adding')
+                    onClose()
                 })
             }).catch((err) => {
                 console.log('error adding task', err)

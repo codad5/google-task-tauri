@@ -58,6 +58,16 @@ const authLoadingState = atom<boolean>({
     default: false,
 });
 
+const isOnlineState = atom<boolean>({
+    key: 'isOnlineStae', 
+    default : navigator.onLine
+})
+
+const isOnlineSelector = selector({
+    key: 'isOnlineSelector',
+    get: () => navigator.onLine,
+    set : ({set}) => set(isOnlineState, navigator.onLine)
+})
 
 const authLoadingSelector = selector({
     key: 'authLoadingSelector',
@@ -176,5 +186,7 @@ export {
     messageState,
     messageSelector,
     authLoadingState, 
-    authLoadingSelector
+    authLoadingSelector,
+    isOnlineState,
+    isOnlineSelector,
 };
