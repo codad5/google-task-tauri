@@ -29,14 +29,6 @@ fn run_specta() {
 
 fn main() {
     dotenv::from_filename(ENV_FILE).ok();
-
-    // set default DB_PASSWORD env variable if not set
-    // this is setting is for now till we have a better way to handle this env variable on build
-    if env::var("DB_PASSWORD").is_err() {
-        env::set_var("DB_PASSWORD", "password");
-    }
-
-    initialize_user_files();
     run_specta();
 
     tauri::Builder::default()

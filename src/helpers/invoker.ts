@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api/tauri';
 import * as commands from './commands';
 import { AccessToken, SaveAccessTokenResponse, SaveTokenResponse } from './commands';
-import StoreDb from './StoreDb';
+import StoreDb from './AuthStore';
 import settings from '../config/settings';
 
 

@@ -36,5 +36,5 @@ export function loadCode() {
 
 export type GreetResponse = { message: string }
 export type SaveTokenResponse = { message: string; token: string; success: boolean }
-export type SaveAccessTokenResponse ={  message: string; success: boolean; token: AccessToken }
+export type SaveAccessTokenResponse = { message: string; success: boolean; token: AccessToken }
 export type AccessToken = { access_token: string; expires_in: number; refresh_token: string; scope: string; token_type: string; id_token: string }
