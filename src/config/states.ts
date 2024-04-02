@@ -29,7 +29,10 @@ const userProfileState = atom<UserProfile | null>({
 
 const accessTokenState = atom<string | null>({
     key: 'accessTokenState',
-    default: (await get_access_token()).access_token,
+    default: get_access_token().then(value => value?.access_token ?? null).catch((err) => {
+        console.error("accessTokenState error", err)
+        return null
+    })
 });
 
 const taskObjectState = atom<Task>({
@@ -39,7 +42,10 @@ const taskObjectState = atom<Task>({
 
 const activeTaskCategoryState = atom<number>({
     key: 'activeTaskCategoryState',
-    default: await SettingsStore.get<number>(settings.storage.constants.last_active_category) ?? -1
+    default: SettingsStore.get<number>(settings.storage.constants.last_active_category).then(value => value ?? -1).catch(err => {
+        console.error("activeTaskCategoryState error", err)
+        return -1
+    })
 });
 
 const activeCategoryTasksState = atom<task[]>({
