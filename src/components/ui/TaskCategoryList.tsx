@@ -4,7 +4,7 @@ import { activeTaskCategoryState, taskCategoriesListSelector } from "../../confi
 import { taskCategory } from "../../types/taskapi";
 
 export default function TaskCategoryList() {
-    const [activeTaskCategory, setActiveTaskCategory] = useRecoilState<number>(activeTaskCategoryState)
+    const [, setActiveTaskCategory] = useRecoilState<number>(activeTaskCategoryState)
     const taskCategoryList = useRecoilValue<taskCategory[]>(taskCategoriesListSelector)
     return (
         <TabList w="100%" overflowX="auto" gap={2} px={2} py={1}  borderRadius="md" scrollBehavior="smooth" >

@@ -1,5 +1,5 @@
 import { useRecoilValue } from "recoil"
-import { activeCategoryTasksSelector, activeCategoryTasksState } from "../../config/states"
+import { activeCategoryTasksState } from "../../config/states"
 import { task } from "../../types/taskapi"
 import TaskItem from "./TaskItem"
 import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Center, TabPanel } from "@chakra-ui/react"

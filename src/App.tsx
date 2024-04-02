@@ -3,7 +3,7 @@ import { Box, Button, Spinner, useToast  } from '@chakra-ui/react'
 import { getAccessToken, saveAuthCode, handleInitialLogin, handleLoadFrom, handleLogin, handleLogout } from "./helpers/auth";
 import { loadContextmenu } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
-import { useRecoilRefresher_UNSTABLE, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { activeTaskCategoryState, attemptLoginState, attemptLogoutState, authLoadingState, isOnlineSelector, loggedInSelector, messageState } from "./config/states";
 import Header from "./components/ui/Header";
 import { listen_for_auth_code } from "./helpers/eventlistner";

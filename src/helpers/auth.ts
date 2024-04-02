@@ -1,12 +1,12 @@
 import { shell } from "@tauri-apps/api";
 import axios from "axios";
 import { UserProfile } from "../types/googleapis";
-import { readTextFile, removeFile, writeTextFile, exists } from "@tauri-apps/api/fs";
+import { readTextFile, removeFile, writeTextFile } from "@tauri-apps/api/fs";
 import { CLIENT_ID, CLIENT_SECRET } from "../config/credentials";
 import settings from "../config/settings";
 import { generate_oauth_port, get_access_token, get_auth_code, save_access_token, save_auth_code } from "./invoker";
 import { AccessToken } from "./commands";
-import { getRecoil, setRecoil } from "recoil-nexus";
+import { setRecoil } from "recoil-nexus";
 import { accessTokenState, activeCategoryTasksState, activeTaskCategoryState, authLoadingState, messageState, userProfileState } from "../config/states";
 import { pushNotification } from "./windowhelper";
 

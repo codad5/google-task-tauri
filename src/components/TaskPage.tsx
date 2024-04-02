@@ -18,7 +18,7 @@ export default function TaskPage() {
   
 
   const [taskCategoryList, setTaskCategoryList] = useRecoilState<taskCategory[]>(taskCategoriesListState)
-  const [activeTaskCategory, setActiveTaskCategory] = useRecoilState<number>(activeTaskCategoryState)
+  const [activeTaskCategory] = useRecoilState<number>(activeTaskCategoryState)
   const setActiveCategoryTasks = useSetRecoilState<task[]>(activeCategoryTasksState)
   const [loading, setloading] = useState(true)
   const [toastMessage, setToastMessage] = useRecoilState(messageState)
