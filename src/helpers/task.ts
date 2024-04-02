@@ -318,6 +318,7 @@ export class Task {
 
     async getTasksByCategoryPositionFromApi(position: number): Promise<task[]> {
         if(!navigator.onLine) throw new Error("No internet connection");
+        if (position < 0) position = 0;
         const taskCategory = this.tasksCategoryList.get()[position];
         if (!taskCategory) throw new Error("Task category not found");
         const url = `${this.baseUrl}/lists/${taskCategory.id}/tasks`;
