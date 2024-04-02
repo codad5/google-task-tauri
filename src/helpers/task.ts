@@ -194,7 +194,7 @@ export class Task {
             if (!tasks) tasks = []
             this.tasksCategoryList.set(tasks.map((taskCategory) => {
                 // if category with same id exists, merge them
-                const existingCategory = this.tasksCategoryList.get()?.find((category) => category.id === taskCategory.id);
+                const existingCategory = this.tasksCategoryList.get()?.find((category) => category?.id === taskCategory?.id);
                 if (existingCategory) {
                     taskCategory.tasks = [...existingCategory.tasks || [], ...taskCategory.tasks || []];
                 }
@@ -247,7 +247,7 @@ export class Task {
         try {
             const tasks = await this.retrieveTasksByCategoryPosition(position);
             this.updateTaskCategoryList(position, tasks);
-            await this.saveTasksToFileIfNeeded(tasks.length > 0);
+            await this.saveTasksToFileIfNeeded(tasks?.length > 0);
             return tasks;
         } catch (error) {
             console.error("Error getting tasks by category position:", (error as Error).message);
@@ -318,6 +318,7 @@ export class Task {
 
     async getTasksByCategoryPositionFromApi(position: number): Promise<task[]> {
         if(!navigator.onLine) throw new Error("No internet connection");
+        if (position < 0) position = 0;
         const taskCategory = this.tasksCategoryList.get()[position];
         if (!taskCategory) throw new Error("Task category not found");
         const url = `${this.baseUrl}/lists/${taskCategory.id}/tasks`;

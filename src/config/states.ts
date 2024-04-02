@@ -2,6 +2,10 @@ import { atom, selector } from 'recoil';
 import { UserProfile } from '../types/googleapis';
 import { Task } from '../helpers/task';
 import { task, taskCategory } from '../types/taskapi';
+import { SettingsStore } from '../helpers/DBStores';
+import settings from './settings';
+import { get_access_token } from '../helpers/invoker';
+
 
 // const loggedInState = atom({
 //     key: 'loggedInState',
@@ -25,7 +29,7 @@ const userProfileState = atom<UserProfile | null>({
 
 const accessTokenState = atom<string | null>({
     key: 'accessTokenState',
-    default: null,
+    default: (await get_access_token()).access_token,
 });
 
 const taskObjectState = atom<Task>({
@@ -35,7 +39,7 @@ const taskObjectState = atom<Task>({
 
 const activeTaskCategoryState = atom<number>({
     key: 'activeTaskCategoryState',
-    default: -1,
+    default: await SettingsStore.get<number>(settings.storage.constants.last_active_category) ?? -1
 });
 
 const activeCategoryTasksState = atom<task[]>({
@@ -53,14 +57,37 @@ const messageState = atom<{ title: string, body?: string , type: "info" | "warni
     default: null,
 });
     
+const authLoadingState = atom<boolean>({
+    key: 'authLoading',
+    default: false,
+});
 
+const isOnlineState = atom<boolean>({
+    key: 'isOnlineStae', 
+    default : navigator.onLine
+})
+
+const isOnlineSelector = selector({
+    key: 'isOnlineSelector',
+    get: () => navigator.onLine,
+    set : ({set}) => set(isOnlineState, navigator.onLine)
+})
+
+const authLoadingSelector = selector({
+    key: 'authLoadingSelector',
+    get: ({ get }) => {
+        const loading = get(authLoadingState);
+        return loading;
+    },
+});
 
 
 const loggedInSelector = selector({
     key: 'loggedInSelector',
     get: ({ get }) => {
         const loggedIn = get(userProfileState);
-        return loggedIn && loggedIn.email != null && loggedIn.email != "";
+        const accessToken = get(accessTokenState);
+        return loggedIn && loggedIn.email != null && loggedIn.email != "" && accessToken;
     },
 });
 
@@ -163,4 +190,8 @@ export {
     attemptLogoutSelector,
     messageState,
     messageSelector,
+    authLoadingState, 
+    authLoadingSelector,
+    isOnlineState,
+    isOnlineSelector,
 };

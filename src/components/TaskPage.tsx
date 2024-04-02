@@ -2,7 +2,7 @@ import { useState , useEffect} from "react";
 import { Tabs, TabPanels, Box, Spinner} from '@chakra-ui/react'
 import { taskCategory, task } from "../types/taskapi";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { accessTokenSelector, activeCategoryTasksState, activeTaskCategoryState, taskObjectState, taskCategoriesListState, messageState } from "../config/states";
+import { accessTokenSelector, activeCategoryTasksState, activeTaskCategoryState, taskObjectState, taskCategoriesListState, messageState, isOnlineSelector } from "../config/states";
 import { Task } from "../helpers/task";
 import TaskList from "./ui/TaskList";
 import AddTaskForm from "./ui/AddTaskForm";
@@ -22,6 +22,7 @@ export default function TaskPage() {
   const setActiveCategoryTasks = useSetRecoilState<task[]>(activeCategoryTasksState)
   const [loading, setloading] = useState(true)
   const [toastMessage, setToastMessage] = useRecoilState(messageState)
+  const isOnline = useRecoilValue(isOnlineSelector)
   
   useEffect(() => {
     console.log('before task object', Taskobject, access_token)
@@ -39,7 +40,6 @@ export default function TaskPage() {
     console.log('after task object', Taskobject)
     Taskobject.getTaskCategories().then((data) => {
       setTaskCategoryList(data)
-      if (data.length > 0) setActiveTaskCategory(0)
       return data
     }).then(() => {
       Taskobject.getTasksByCategoryPosition(activeTaskCategory >= 0 ? activeTaskCategory : 0).then((data) => {
@@ -50,34 +50,37 @@ export default function TaskPage() {
   }, [Taskobject])
 
   useEffect(() => {
+    console.log('a active task or online changed', navigator.onLine)
     setloading(true)
     if (activeTaskCategory < 0) return;
     Taskobject.getTasksByCategoryPosition(activeTaskCategory).then((data) => {
       setActiveCategoryTasks(data)
       setloading(false)
     })
-  }, [activeTaskCategory])
+  }, [activeTaskCategory, isOnline])
 
 
   return (
     <div className="">
-        <Tabs variant='soft-rounded' colorScheme='green' h='80%'>
+        <Tabs variant='soft-rounded' colorScheme='green' h='80%' defaultIndex={activeTaskCategory} >
           <TaskCategoryList />
         {
-          loading || taskCategoryList.length <= 0 ? (
+          loading || taskCategoryList?.length <= 0 ? (
             <Box p={4} h='90%' display='flex' justifyContent='center' alignItems='center'>
-              <Spinner size='xl' /> 
+              <Spinner size='xl' />
             </Box>) : (
-            <Box p={4} h='90%'>
-              <TabPanels>
-                <TaskList />
-              { taskCategoryList.length > 0 && activeTaskCategory >= 0 &&
-              (
-                  <AddTaskForm />
-                )
-              }
-              </TabPanels>
-              </Box>
+              <>
+                <TabPanels p={4} h='90%'>
+                  {
+                    taskCategoryList?.map((val, key) => (
+                      <TaskList key={key} taskCategory={val?.tasks ?? []} />
+                    ))
+                  }
+                </TabPanels>
+                <Box >
+                  { taskCategoryList.length > 0 && activeTaskCategory >= 0 &&  <AddTaskForm />}
+                </Box>
+              </>
             )
         }
         </Tabs>

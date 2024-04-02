@@ -1,5 +1,5 @@
 import { DeleteIcon } from "@chakra-ui/icons";
-import { Box, Checkbox, Flex, IconButton } from "@chakra-ui/react";
+import { Box, Checkbox, Flex, IconButton, Spinner } from "@chakra-ui/react";
 import { task, taskCategory } from "../../types/taskapi";
 import { useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -13,6 +13,8 @@ export default function TaskItem({ task }: { task: task }) {
     const activeTaskCategory = useRecoilValue<number>(activeTaskCategorySelector)
     const setActiveCategoryTasks = useSetRecoilState(activeCategoryTasksState)
     const setToastMessage = useSetRecoilState(messageState)
+    const [deleteIsClicked, setDeleteIsClicked] = useState(false)
+    
 
 
     const handleTaskCheck = (task: task) => {
@@ -31,8 +33,9 @@ export default function TaskItem({ task }: { task: task }) {
     }
 
     const handleTaskDelete = (task: task) => {
+        setDeleteIsClicked(true)
         Taskobject.deleteTask(task, taskCategoryList[activeTaskCategory].id).then((d) => {
-            if(!d) return  console.log('task deleted')
+            if(d == null) throw new Error("Task not deleted")
             Taskobject.getTasksByCategoryPosition(activeTaskCategory).then(() => {
                 setActiveCategoryTasks(active => {
                     return active.filter((t) => {
@@ -40,7 +43,21 @@ export default function TaskItem({ task }: { task: task }) {
                     })
                 })
             })
-        }).finally(() => { Taskobject.clearPositionCache(activeTaskCategory) })
+        }).then(() => {
+            Taskobject.clearPositionCache(activeTaskCategory)
+            setToastMessage({
+                title: "Task Deleted",
+                type : "warning",
+            })
+        }).catch((err) => {
+            setToastMessage({
+                title: "Error",
+                body:(err as Error).message,
+                type : "warning",
+            })
+        }).finally(() => {
+            setDeleteIsClicked(false)
+        })
     }
         
     return (
@@ -52,17 +69,15 @@ export default function TaskItem({ task }: { task: task }) {
                     </Box>
                 </Checkbox>
                 <Box w="10%" as="span">
-                    {isHovered && (
-                        <IconButton
+                    {deleteIsClicked ? <Spinner size={'sm'} /> : isHovered && (<IconButton
                         size='xs'
                         variant='outline'
                         ml="2"
                         aria-label="Delete task"
                         icon={<DeleteIcon />}
-                        
                         onClick={() => handleTaskDelete(task)}
-                        />
-                    )}
+                    />)
+                    }
                 </Box>
             </Flex> 
         </Box>

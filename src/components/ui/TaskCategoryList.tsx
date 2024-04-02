@@ -1,10 +1,10 @@
 import { Tab, TabList } from "@chakra-ui/react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { activeTaskCategoryState, taskCategoriesListSelector } from "../../config/states";
 import { taskCategory } from "../../types/taskapi";
 
 export default function TaskCategoryList() {
-    const setActiveTaskCategory = useSetRecoilState<number>(activeTaskCategoryState)
+    const [activeTaskCategory, setActiveTaskCategory] = useRecoilState<number>(activeTaskCategoryState)
     const taskCategoryList = useRecoilValue<taskCategory[]>(taskCategoriesListSelector)
     return (
         <TabList w="100%" overflowX="auto" gap={2} px={2} py={1}  borderRadius="md" scrollBehavior="smooth" >

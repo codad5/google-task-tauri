@@ -18,6 +18,13 @@ export default {
             tasks: "tasks.json",
             authcode: "auth_code.db",
             user_profile: "user_profile.json",
+        },
+        constants: {
+            access_token: "access_token",
+            tasks: "tasks",
+            authcode: "auth_code",
+            user_profile: "user_profile",
+            last_active_category: "last_active_category"
         }
     },
     api: {

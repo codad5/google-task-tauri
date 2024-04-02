@@ -16,8 +16,6 @@ tauri-build = { version = "1.5", features = [] }
 tauri = { version = "1.4", features = [ "system-tray", "updater", "global-shortcut-all", "notification-all", "fs-all", "dialog-confirm", "shell-open", "dialog-ask", "dialog-message"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-google-tasks1 = "5.0.2"
-oauth2 = "3.0"
 borsh = { version = "1.2.0", features = ["std", "borsh-derive", "derive", "bson", "bytes", "ascii", "de_strict_order", "rc", "unstable__schema"] }
 cocoon = "0.4.1"
 tauri-plugin-oauth = { git = "https://github.com/FabianLars/tauri-plugin-oauth", branch = "main" }
@@ -27,6 +25,7 @@ tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-wo
 dotenv = "0.15.0"
 lazy_static = "1.4.0"
 strum = { version = "0.25.0", features = ["strum_macros"] }
+tauri-plugin-store = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 specta = "1.0.5"
 tauri-specta = { version = "1.0.2", features = ["javascript", "typescript"] }
 
