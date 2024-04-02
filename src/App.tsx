@@ -4,15 +4,18 @@ import { getAccessToken, saveAuthCode, handleInitialLogin, handleLoadFrom, handl
 import { loadContextmenu } from "./helpers/windowhelper";
 import TaskPage from "./components/TaskPage";
 import { useRecoilRefresher_UNSTABLE, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { attemptLoginState, attemptLogoutState, authLoadingState, isOnlineSelector, loggedInSelector, messageState } from "./config/states";
+import { activeTaskCategoryState, attemptLoginState, attemptLogoutState, authLoadingState, isOnlineSelector, loggedInSelector, messageState } from "./config/states";
 import Header from "./components/ui/Header";
 import { listen_for_auth_code } from "./helpers/eventlistner";
+import { SettingsStore } from "./helpers/DBStores";
+import settings from "./config/settings";
 
 // disable default context menu on build
 loadContextmenu();
 
 function App() {
   const [loading, setLoading] = useRecoilState<boolean>(authLoadingState);
+  const activeCategoryValue = useRecoilValue(activeTaskCategoryState)
   const loggedIn = useRecoilValue(loggedInSelector);
   const [attemptedLogin, setAttemptedLogin] = useRecoilState<boolean>(attemptLoginState);
   const [attemptedLogout, setAttemptedLogout] = useRecoilState<boolean>(attemptLogoutState);
@@ -54,6 +57,10 @@ function App() {
       setAttemptedLogout(false);
     }
   }, [attemptedLogout])
+  
+  useEffect(() => {
+    SettingsStore.set(settings.storage.constants.last_active_category, activeCategoryValue).then(() => {console.log("Setting active category")})
+  }, [activeCategoryValue])
 
   
 

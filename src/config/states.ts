@@ -2,6 +2,9 @@ import { atom, selector } from 'recoil';
 import { UserProfile } from '../types/googleapis';
 import { Task } from '../helpers/task';
 import { task, taskCategory } from '../types/taskapi';
+import { SettingsStore } from '../helpers/DBStores';
+import settings from './settings';
+
 
 // const loggedInState = atom({
 //     key: 'loggedInState',
@@ -35,7 +38,7 @@ const taskObjectState = atom<Task>({
 
 const activeTaskCategoryState = atom<number>({
     key: 'activeTaskCategoryState',
-    default: -1,
+    default: await SettingsStore.get<number>(settings.storage.constants.last_active_category) ?? -1
 });
 
 const activeCategoryTasksState = atom<task[]>({

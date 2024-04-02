@@ -24,6 +24,7 @@ export default {
             tasks: "tasks",
             authcode: "auth_code",
             user_profile: "user_profile",
+            last_active_category: "last_active_category"
         }
     },
     api: {
