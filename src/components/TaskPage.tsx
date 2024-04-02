@@ -63,7 +63,7 @@ export default function TaskPage() {
 
   return (
     <div className="">
-        <Tabs variant='soft-rounded' colorScheme='green' h='80%'>
+        <Tabs variant='soft-rounded' colorScheme='green' h='80%' index={activeTaskCategory} defaultIndex={activeTaskCategory}>
           <TaskCategoryList />
         {
           loading || taskCategoryList.length <= 0 ? (

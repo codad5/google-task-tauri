@@ -4,6 +4,7 @@ import { Task } from '../helpers/task';
 import { task, taskCategory } from '../types/taskapi';
 import { SettingsStore } from '../helpers/DBStores';
 import settings from './settings';
+import { get_access_token } from '../helpers/invoker';
 
 
 // const loggedInState = atom({
@@ -28,7 +29,7 @@ const userProfileState = atom<UserProfile | null>({
 
 const accessTokenState = atom<string | null>({
     key: 'accessTokenState',
-    default: null,
+    default: (await get_access_token()).access_token,
 });
 
 const taskObjectState = atom<Task>({
@@ -85,7 +86,8 @@ const loggedInSelector = selector({
     key: 'loggedInSelector',
     get: ({ get }) => {
         const loggedIn = get(userProfileState);
-        return loggedIn && loggedIn.email != null && loggedIn.email != "";
+        const accessToken = get(accessTokenState);
+        return loggedIn && loggedIn.email != null && loggedIn.email != "" && accessToken;
     },
 });
 
