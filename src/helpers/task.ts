@@ -247,7 +247,7 @@ export class Task {
         try {
             const tasks = await this.retrieveTasksByCategoryPosition(position);
             this.updateTaskCategoryList(position, tasks);
-            await this.saveTasksToFileIfNeeded(tasks.length > 0);
+            await this.saveTasksToFileIfNeeded(tasks?.length > 0);
             return tasks;
         } catch (error) {
             console.error("Error getting tasks by category position:", (error as Error).message);
