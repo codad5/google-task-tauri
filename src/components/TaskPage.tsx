@@ -40,7 +40,6 @@ export default function TaskPage() {
     console.log('after task object', Taskobject)
     Taskobject.getTaskCategories().then((data) => {
       setTaskCategoryList(data)
-      if (data.length > 0) setActiveTaskCategory(0)
       return data
     }).then(() => {
       Taskobject.getTasksByCategoryPosition(activeTaskCategory >= 0 ? activeTaskCategory : 0).then((data) => {
@@ -63,23 +62,25 @@ export default function TaskPage() {
 
   return (
     <div className="">
-        <Tabs variant='soft-rounded' colorScheme='green' h='80%' index={activeTaskCategory} defaultIndex={activeTaskCategory}>
+        <Tabs variant='soft-rounded' colorScheme='green' h='80%' defaultIndex={activeTaskCategory} >
           <TaskCategoryList />
         {
-          loading || taskCategoryList.length <= 0 ? (
+          loading || taskCategoryList?.length <= 0 ? (
             <Box p={4} h='90%' display='flex' justifyContent='center' alignItems='center'>
-              <Spinner size='xl' /> 
+              <Spinner size='xl' />
             </Box>) : (
-            <Box p={4} h='90%'>
-              <TabPanels>
-                <TaskList />
-              { taskCategoryList.length > 0 && activeTaskCategory >= 0 &&
-              (
-                  <AddTaskForm />
-                )
-              }
-              </TabPanels>
-              </Box>
+              <>
+                <TabPanels p={4} h='90%'>
+                  {
+                    taskCategoryList?.map((val, key) => (
+                      <TaskList key={key} taskCategory={val?.tasks ?? []} />
+                    ))
+                  }
+                </TabPanels>
+                <Box >
+                  { taskCategoryList.length > 0 && activeTaskCategory >= 0 &&  <AddTaskForm />}
+                </Box>
+              </>
             )
         }
         </Tabs>
